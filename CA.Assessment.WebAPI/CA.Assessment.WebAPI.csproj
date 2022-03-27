@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CA.Assessment.Application\CA.Assessment.Application.csproj" />
+      <ProjectReference Include="..\CA.Assessment.Database.Migrations\CA.Assessment.Database.Migrations.csproj" />
+      <ProjectReference Include="..\CA.Assessment.Infrastructure\CA.Assessment.Infrastructure.csproj" />
+    </ItemGroup>
+
+</Project>
