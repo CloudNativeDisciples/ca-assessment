@@ -7,12 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CA.Assessment.Application\CA.Assessment.Application.csproj" />
+        <ProjectReference Include="..\CA.Assessment.Application\CA.Assessment.Application.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Dapper" Version="2.0.123" />
-        <PackageReference Include="System.Data.SQLite" Version="1.0.115.5" />
+        <PackageReference Include="Dapper" Version="2.0.123"/>
+        <PackageReference Include="System.Data.SQLite" Version="1.0.115.5"/>
     </ItemGroup>
 
 </Project>

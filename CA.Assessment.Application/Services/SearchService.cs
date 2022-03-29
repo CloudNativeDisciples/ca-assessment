@@ -1,5 +1,4 @@
 using CA.Assessment.Application.Dtos;
-using CA.Assessment.Application.Mappers;
 using CA.Assessment.Application.Repositories;
 using CA.Assessment.Store;
 
@@ -23,10 +22,7 @@ internal sealed class SearchService : ISearchService
     {
         if (filters is null) throw new ArgumentNullException(nameof(filters));
 
-        if (filters.None)
-        {
-            return Enumerable.Empty<BlogPostSummary>();
-        }
+        if (filters.None) return Enumerable.Empty<BlogPostSummary>();
 
         await databaseSessionManager.OpenConnectionAsync();
 

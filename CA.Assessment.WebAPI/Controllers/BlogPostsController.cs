@@ -62,10 +62,7 @@ public class BlogPostsController : ControllerBase
     [HttpPost("search")]
     public async Task<IActionResult> SearchBlogPostsAsync([FromBody] SearchBlogPostsFilters? searchBlogPostsFilters)
     {
-        if (searchBlogPostsFilters is null)
-        {
-            return BadRequest();
-        }
+        if (searchBlogPostsFilters is null) return BadRequest();
 
         var searchResults = await searchService.SearchBlogPostsAsync(searchBlogPostsFilters);
 

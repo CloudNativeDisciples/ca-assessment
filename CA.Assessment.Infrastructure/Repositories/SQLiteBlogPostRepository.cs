@@ -212,8 +212,8 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
         };
 
         var rows = await databaseSession.Connection.QueryAsync<BlogPostSummaryRow>(searchQuery,
-            param: queryParams,
-            transaction: databaseSession.Transaction);
+            queryParams,
+            databaseSession.Transaction);
 
         return blogPostSummaryRowMapper.MapMany(rows);
     }

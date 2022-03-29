@@ -75,9 +75,6 @@ public abstract class IntegrationTest
 
     protected void SetCurrentUserKind(UserKind userKind)
     {
-        if (currentUserKindProvider is not null)
-        {
-            currentUserKindProvider.CurrentUserKind = userKind;
-        }
+        if (currentUserKindProvider is not null) currentUserKindProvider.CurrentUserKind = userKind;
     }
 }
