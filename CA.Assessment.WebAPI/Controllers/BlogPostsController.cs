@@ -1,5 +1,7 @@
+using System.Net.Mime;
 using CA.Assessment.Application.Dtos;
 using CA.Assessment.Application.Services;
+using CA.Assessment.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CA.Assessment.WebAPI.Controllers;
@@ -11,15 +13,18 @@ public class BlogPostsController : ControllerBase
     private readonly IBlogPostsService blogPostsService;
     private readonly ISearchService searchService;
     private readonly ITagsService tagsService;
+    private readonly IImageService imageService;
 
     public BlogPostsController(
         IBlogPostsService blogPostsService,
         ISearchService searchService,
-        ITagsService tagsService)
+        ITagsService tagsService,
+        IImageService imageService)
     {
         this.blogPostsService = blogPostsService ?? throw new ArgumentNullException(nameof(blogPostsService));
         this.searchService = searchService ?? throw new ArgumentNullException(nameof(searchService));
         this.tagsService = tagsService ?? throw new ArgumentNullException(nameof(tagsService));
+        this.imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
     }
 
     [HttpPost]
@@ -77,16 +82,20 @@ public class BlogPostsController : ControllerBase
     [HttpDelete("{blogPostId}/tags")]
     public async Task<IActionResult> RemoveTagsAsync([FromRoute] Guid blogPostId, [FromBody] IEnumerable<string>? tags)
     {
+        if (tags is null)
+        {
+            return BadRequest();
+        }
+
+        await tagsService.UntagAsync(blogPostId, tags);
+
         return Ok();
     }
 
     [HttpPut("{blogPostId}/tags")]
     public async Task<IActionResult> AddTagsAsync([FromRoute] Guid blogPostId, [FromBody] IEnumerable<string>? tags)
     {
-        if (tags is null)
-        {
-            return BadRequest();
-        }
+        if (tags is null) return BadRequest();
 
         await tagsService.TagAsync(blogPostId, tags);
 
@@ -94,8 +103,35 @@ public class BlogPostsController : ControllerBase
     }
 
     [HttpPost("{blogPostId}/images")]
-    public async Task<IActionResult> UploadImageAsync()
+    public async Task<IActionResult> UploadImageAsync([FromRoute] Guid blogPostId, [FromForm] IFormFile? image)
     {
+        if (image is null)
+        {
+            return BadRequest();
+        }
+
+        await using var fileStream = image.OpenReadStream();
+
+        var newImageId = Guid.NewGuid();
+
+        await using var imageStream = image.OpenReadStream();
+
+        using var binaryStream = new BinaryReader(imageStream);
+
+        var imageContents = await binaryStream.ReadAllAsync();
+
+        var newBlogPostImage = new NewBlogPostImage(image.Name, image.ContentType, imageContents);
+
+        await imageService.AttachImageToBlogPostAsync(newImageId, blogPostId, newBlogPostImage);
+
         return Ok();
+    }
+
+    [HttpGet("{blogPostId}/images/{imageId}")]
+    public async Task<IActionResult> GetImageAsync([FromRoute] Guid blogPostId, [FromRoute] Guid imageId)
+    {
+        var image = await imageService.GetBlogPostImageAsync(blogPostId, imageId);
+
+        return File(image.Content, image.Mime);
     }
 }

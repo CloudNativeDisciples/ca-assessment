@@ -116,8 +116,8 @@ internal sealed class SQLiteTagsRepository : ITagsRepository
                 .ToList();
 
         await databaseSession.Connection.ExecuteAsync(query,
-            param: queryParams,
-            transaction: databaseSession.Transaction);
+            queryParams,
+            databaseSession.Transaction);
     }
 
     public async Task RemoveTagsToBlogPostAsync(Guid blogPostId, IEnumerable<Tag> tagsToRemove)
@@ -142,7 +142,7 @@ internal sealed class SQLiteTagsRepository : ITagsRepository
                 .ToList();
 
         await databaseSession.Connection.ExecuteAsync(query,
-            param: queryParams,
-            transaction: databaseSession.Transaction);
+            queryParams,
+            databaseSession.Transaction);
     }
 }

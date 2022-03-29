@@ -1,6 +1,5 @@
 using CA.Assessment.Application.Providers;
 using CA.Assessment.Application.Repositories;
-using CA.Assessment.Domain.Anemic;
 using CA.Assessment.Domain.Anemic.Exceptions;
 using CA.Assessment.Store;
 
@@ -8,10 +7,10 @@ namespace CA.Assessment.Application.Services;
 
 internal sealed class TagsService : ITagsService
 {
-    private readonly IDatabaseSessionManager databaseSessionManager;
-    private readonly ITagsRepository tagsRepository;
     private readonly IBlogPostRepository blogPostRepository;
+    private readonly IDatabaseSessionManager databaseSessionManager;
     private readonly ITagsMaker tagsMaker;
+    private readonly ITagsRepository tagsRepository;
 
     public TagsService(
         IDatabaseSessionManager databaseSessionManager,
@@ -39,10 +38,7 @@ internal sealed class TagsService : ITagsService
         {
             var maybeBlogPost = await blogPostRepository.GetAsync(blogPostId);
 
-            if (maybeBlogPost is null)
-            {
-                throw new BlogPostNotFoundException(blogPostId);
-            }
+            if (maybeBlogPost is null) throw new BlogPostNotFoundException(blogPostId);
 
             var existingTags = await tagsRepository.GetManyAsync(maybeBlogPost.Tags);
 
@@ -72,10 +68,7 @@ internal sealed class TagsService : ITagsService
         {
             var maybeBlogPost = await blogPostRepository.GetAsync(blogPostId);
 
-            if (maybeBlogPost is null)
-            {
-                throw new BlogPostNotFoundException(blogPostId);
-            }
+            if (maybeBlogPost is null) throw new BlogPostNotFoundException(blogPostId);
 
             var existingTags = await tagsRepository.GetManyAsync(maybeBlogPost.Tags);
 

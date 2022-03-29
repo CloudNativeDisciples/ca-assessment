@@ -16,8 +16,7 @@ public sealed class NewBlogPostValidator : AbstractValidator<NewBlogPost>
 
         RuleFor(nbp => nbp.Category).NotEmpty();
 
-        RuleFor(nbp => nbp.Tags).NotEmpty()
-            .ForEach(t => t.NotEmpty().WithErrorCode(ValidationErrorCodes.BLOG_POST_TAG_IS_EMPTY))
+        RuleFor(nbp => nbp.Tags).ForEach(t => t.NotEmpty().WithErrorCode(ValidationErrorCodes.BLOG_POST_TAG_IS_EMPTY))
             .WithErrorCode(ValidationErrorCodes.NO_TAGS_SPECIFIED_ON_BLOG_POST);
     }
 }

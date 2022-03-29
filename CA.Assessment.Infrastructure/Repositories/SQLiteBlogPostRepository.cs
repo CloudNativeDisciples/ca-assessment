@@ -157,7 +157,7 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
 
         var query = @"
             UPDATE blog_posts
-            SET title = @Title, content = @Content, author = @Author, category_id = @Category
+            SET title = @Title, content = @Content, author = @Author, category_id = @Category, image_id = @Image
             WHERE id = @BlogPostId
         ";
 
@@ -167,7 +167,8 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
             blogPost.Title,
             blogPost.Content,
             blogPost.Author,
-            Category = blogPost.Category.ToString()
+            Category = blogPost.Category.ToString(),
+            Image = blogPost.Image.ToString()
         };
 
         await databaseSession.Connection.ExecuteAsync(query,

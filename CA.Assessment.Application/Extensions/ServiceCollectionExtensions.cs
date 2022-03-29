@@ -20,11 +20,13 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddTransient<IBlogPostsService, BlogPostService>();
         serviceCollection.AddTransient<ISearchService, SearchService>();
         serviceCollection.AddTransient<ITagsService, TagsService>();
+        serviceCollection.AddTransient<IImageService, ImageService>();
 
         serviceCollection.AddTransient<IValidator<NewBlogPost>, NewBlogPostValidator>();
         serviceCollection.AddTransient<IValidator<UpdateBlogPost>, UpdateBlogPostValidator>();
 
         serviceCollection.AddTransient<BlogPostMapper>();
+        serviceCollection.AddTransient<ImageMapper>();
 
         return serviceCollection;
     }

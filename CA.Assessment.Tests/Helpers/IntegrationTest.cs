@@ -18,6 +18,7 @@ public abstract class IntegrationTest
     private IServiceScope? currentServiceProviderScope;
     private CurrentUserKindTestProvider? currentUserKindProvider;
     private ServiceProvider? serviceProvider;
+    private string? imageStoreFolder;
 
     [SetUp]
     public void SetUp()
@@ -25,13 +26,14 @@ public abstract class IntegrationTest
         var serviceCollection = new ServiceCollection();
 
         currentDatabaseName = $"{Guid.NewGuid():N}.db";
+        imageStoreFolder = $"{imageStoreFolder}.images";
 
         var databaseConnectionString = $"Data Source = {currentDatabaseName}";
 
         serviceCollection.AddAssessmentMigrations(databaseConnectionString)
             .AddAssessmentDatabase(databaseConnectionString)
             .AddAssessmentApplication()
-            .AddAssessmentInfrastructure();
+            .AddAssessmentInfrastructure(imageStoreFolder);
 
         currentUserKindProvider = new CurrentUserKindTestProvider();
 
@@ -58,10 +60,11 @@ public abstract class IntegrationTest
         try
         {
             if (currentDatabaseName is not null) File.Delete(currentDatabaseName);
+            if (imageStoreFolder is not null) Directory.Delete(imageStoreFolder, true);
         }
         catch
         {
-            // It's not a problem if we can't delete the database file 
+            // It's not a problem if we can't delete the database file or image store
         }
     }
 

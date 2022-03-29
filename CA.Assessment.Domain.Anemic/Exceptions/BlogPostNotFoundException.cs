@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 namespace CA.Assessment.Domain.Anemic.Exceptions;
 
 [Serializable]
-public class BlogPostNotFoundException : AssessmentDomainException
+public sealed class BlogPostNotFoundException : AssessmentDomainException
 {
     private BlogPostNotFoundException()
     {
@@ -14,7 +14,7 @@ public class BlogPostNotFoundException : AssessmentDomainException
         NotFoundBlogPostIdentity = notFoundBlogPostIdentity;
     }
 
-    protected BlogPostNotFoundException(
+    private BlogPostNotFoundException(
         SerializationInfo info,
         StreamingContext context) : base(info, context)
     {

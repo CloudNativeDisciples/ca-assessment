@@ -194,4 +194,35 @@ public class BlogPostTest : IntegrationTest
         Assert.That(tagNames, Has.Count.EqualTo(1));
         Assert.That(tagNames, Is.EquivalentTo(new[] { "tag_3" }));
     }
+
+    [Test]
+    public async Task Blog_posts_can_have_an_image()
+    {
+        var sut = Resolve<IImageService>();
+
+        var blogPostsService = Resolve<IBlogPostsService>();
+
+        var newBlogPostId = Guid.NewGuid();
+
+        var newImageId = Guid.NewGuid();
+
+        var newBlogPostRequest = new NewBlogPost("title_1", "content", "author", "category_2",
+            new[] { "tag_1", "tag_2", "tag_3" });
+
+        await blogPostsService.NewAsync(newBlogPostId, newBlogPostRequest);
+
+        var newBlogPostImage = new NewBlogPostImage("test", "image/png", new byte[4] { 15, 14, 13, 14 });
+
+        await sut.AttachImageToBlogPostAsync(newImageId, newBlogPostId, newBlogPostImage);
+
+        var blogPost = await blogPostsService.GetAsync(newBlogPostId);
+
+        var image = await sut.GetBlogPostImageAsync(newBlogPostId, newImageId);
+
+        Assert.That(blogPost!.Image, Is.EqualTo(newImageId));
+
+        Assert.That(image, Is.Not.Null);
+        Assert.That(image.Content, Is.EqualTo(new byte[] { 15, 14, 13, 14 }));
+        Assert.That(image.Mime, Is.EqualTo("image/png"));
+    }
 }
