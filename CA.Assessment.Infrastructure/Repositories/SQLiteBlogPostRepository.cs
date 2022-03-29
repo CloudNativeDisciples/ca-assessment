@@ -1,3 +1,4 @@
+using CA.Assessment.Application.Dtos;
 using CA.Assessment.Application.Repositories;
 using CA.Assessment.Domain.Anemic;
 using CA.Assessment.Infrastructure.Mappers;
@@ -10,12 +11,18 @@ namespace CA.Assessment.Infrastructure.Repositories;
 internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
 {
     private readonly BlogPostRowsMapper blogPostRowsMapper;
+    private readonly BlogPostSummaryRowMapper blogPostSummaryRowMapper;
     private readonly IDatabaseSession databaseSession;
 
-    public SQLiteBlogPostRepository(IDatabaseSession databaseSession, BlogPostRowsMapper blogPostRowsMapper)
+    public SQLiteBlogPostRepository(
+        IDatabaseSession databaseSession,
+        BlogPostRowsMapper blogPostRowsMapper,
+        BlogPostSummaryRowMapper blogPostSummaryRowMapper)
     {
         this.databaseSession = databaseSession ?? throw new ArgumentNullException(nameof(databaseSession));
         this.blogPostRowsMapper = blogPostRowsMapper ?? throw new ArgumentNullException(nameof(blogPostRowsMapper));
+        this.blogPostSummaryRowMapper = blogPostSummaryRowMapper ??
+                                        throw new ArgumentNullException(nameof(blogPostSummaryRowMapper));
     }
 
     public async Task SaveAsync(BlogPost blogPost)
@@ -166,6 +173,49 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
         await databaseSession.Connection.ExecuteAsync(query,
             queryParams,
             databaseSession.Transaction);
+    }
+
+    public async Task<IEnumerable<BlogPostSummary>> SearchAsync(
+        string? filtersTitle,
+        string? filtersCategory,
+        IEnumerable<string>? filtersTags)
+    {
+        if (databaseSession.Connection is null)
+            throw new InvalidOperationException(
+                "No connection in the database session. You must open a connection before calling repository methods");
+
+        var searchQuery = @"
+            SELECT blog_posts.id, blog_posts.title
+            FROM blog_posts
+            INNER JOIN categories ON blog_posts.category_id = categories.id 
+            WHERE (@Title IS NULL OR blog_posts.title LIKE @Title)
+            AND (@Category IS NULL OR categories.name LIKE @Category)
+            AND (
+                @Tags IS NULL OR EXISTS (
+            	SELECT 1 
+            	FROM blog_posts_to_tags
+            	WHERE blog_posts_to_tags.blog_post_id = blog_posts.id
+            	AND blog_posts_to_tags.tag_id IN (
+            		SELECT tags.id
+            		FROM tags
+            		WHERE tags.name LIKE @Tags
+        	        )
+                )
+            )
+        ";
+
+        var queryParams = new
+        {
+            Title = filtersTitle is not null ? $"%{filtersTitle}%" : null,
+            Category = filtersCategory is not null ? $"%{filtersCategory}%" : null,
+            Tags = filtersTags?.Select(t => $"%{t}%").ToList()
+        };
+
+        var rows = await databaseSession.Connection.QueryAsync<BlogPostSummaryRow>(searchQuery,
+            param: queryParams,
+            transaction: databaseSession.Transaction);
+
+        return blogPostSummaryRowMapper.MapMany(rows);
     }
 
     private async Task DeleteTagsFromBlogPostAsync(BlogPost blogPost)

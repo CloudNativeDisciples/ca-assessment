@@ -16,7 +16,7 @@ internal sealed class BlogPostMapper
         this.categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
     }
 
-    public async Task<BlogPostDetails> MapOneToBlogPostDetailsAsync(BlogPost blogPost)
+    public async Task<BlogPostDetail> MapOneToBlogPostDetailsAsync(BlogPost blogPost)
     {
         if (blogPost is null) throw new ArgumentNullException(nameof(blogPost));
 
@@ -32,7 +32,7 @@ internal sealed class BlogPostMapper
 
         var categoryDetails = new CategoryDetails(blogPostCategory.Identity, blogPostCategory.Name);
 
-        return new BlogPostDetails(blogPost.Identity, blogPost.Author, blogPost.Content, blogPost.Title,
+        return new BlogPostDetail(blogPost.Identity, blogPost.Author, blogPost.Content, blogPost.Title,
             blogPost.Image, categoryDetails, tagDetails);
     }
 }

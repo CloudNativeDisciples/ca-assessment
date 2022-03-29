@@ -20,6 +20,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddTransient<TagRowsMapper>();
         serviceCollection.AddTransient<CategoryRowsMapper>();
         serviceCollection.AddTransient<BlogPostRowsMapper>();
+        serviceCollection.AddTransient<BlogPostSummaryRowMapper>();
 
         serviceCollection.AddTransient<IDatabaseConnectionFactory, SQLiteDatabaseConnectionFactory>();
 

@@ -6,7 +6,7 @@ public interface IBlogPostsService
 {
     Task NewAsync(Guid newBlogPostId, NewBlogPost newBlogPostData);
 
-    Task<BlogPostDetails?> GetAsync(Guid blogPostId);
+    Task<BlogPostDetail?> GetAsync(Guid blogPostId);
 
     Task DeleteAsync(Guid blogPostIdentity);
 

@@ -9,10 +9,12 @@ namespace CA.Assessment.WebAPI.Controllers;
 public class BlogPostsController : ControllerBase
 {
     private readonly IBlogPostsService blogPostsService;
+    private readonly ISearchService searchService;
 
-    public BlogPostsController(IBlogPostsService blogPostsService)
+    public BlogPostsController(IBlogPostsService blogPostsService, ISearchService searchService)
     {
         this.blogPostsService = blogPostsService ?? throw new ArgumentNullException(nameof(blogPostsService));
+        this.searchService = searchService ?? throw new ArgumentNullException(nameof(searchService));
     }
 
     [HttpPost]
@@ -54,6 +56,37 @@ public class BlogPostsController : ControllerBase
 
         await blogPostsService.UpdateAsync(blogPostId, updateBlogPost);
 
+        return Ok();
+    }
+
+    [HttpPost("search")]
+    public async Task<IActionResult> SearchBlogPostsAsync([FromBody] SearchBlogPostsFilters? searchBlogPostsFilters)
+    {
+        if (searchBlogPostsFilters is null)
+        {
+            return BadRequest();
+        }
+
+        var searchResults = await searchService.SearchBlogPostsAsync(searchBlogPostsFilters);
+
+        return Ok(searchResults);
+    }
+
+    [HttpDelete("tags/{blogPostId}")]
+    public async Task<IActionResult> RemoveTagsAsync()
+    {
+        return Ok();
+    }
+
+    [HttpPut("tags/{blogPostId}")]
+    public async Task<IActionResult> AddTagsAsync()
+    {
+        return Ok();
+    }
+
+    [HttpPost("images")]
+    public async Task<IActionResult> UploadImageAsync()
+    {
         return Ok();
     }
 }

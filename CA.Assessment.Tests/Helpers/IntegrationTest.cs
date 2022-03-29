@@ -16,7 +16,7 @@ public abstract class IntegrationTest
 {
     private string? currentDatabaseName;
     private IServiceScope? currentServiceProviderScope;
-    private CurrentUserKindTestProvider currentUserKindProvider;
+    private CurrentUserKindTestProvider? currentUserKindProvider;
     private ServiceProvider? serviceProvider;
 
     [SetUp]
@@ -65,7 +65,7 @@ public abstract class IntegrationTest
         }
     }
 
-    public TService Resolve<TService>()
+    protected TService Resolve<TService>() where TService : notnull
     {
         if (currentServiceProviderScope is null)
             throw new InvalidOperationException("You must call SetUp() before resolving services");
@@ -73,8 +73,11 @@ public abstract class IntegrationTest
         return currentServiceProviderScope.ServiceProvider.GetRequiredService<TService>();
     }
 
-    public void SetCurrentUserKind(UserKind userKind)
+    protected void SetCurrentUserKind(UserKind userKind)
     {
-        currentUserKindProvider.CurrentUserKind = userKind;
+        if (currentUserKindProvider is not null)
+        {
+            currentUserKindProvider.CurrentUserKind = userKind;
+        }
     }
 }

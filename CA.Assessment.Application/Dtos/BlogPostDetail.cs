@@ -1,8 +1,8 @@
 namespace CA.Assessment.Application.Dtos;
 
-public sealed class BlogPostDetails
+public sealed class BlogPostDetail
 {
-    public BlogPostDetails(
+    public BlogPostDetail(
         Guid identity,
         string author,
         string content,

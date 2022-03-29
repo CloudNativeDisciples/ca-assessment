@@ -112,4 +112,36 @@ public class BlogPostTest : IntegrationTest
         Assert.That(blogPost!.Title, Is.EqualTo("new title"));
         Assert.That(blogPost.Author, Is.EqualTo("new author"));
     }
+
+    [Test]
+    public async Task Blog_posts_can_be_searched()
+    {
+        var sut = Resolve<ISearchService>();
+
+        var blogPostsService = Resolve<IBlogPostsService>();
+
+        var newBlogPostId = Guid.NewGuid();
+
+        var newBlogPostRequest = new NewBlogPost("title_1", "content", "author", "category_2", new[] { "tag_3" });
+
+        await blogPostsService.NewAsync(newBlogPostId, newBlogPostRequest);
+
+        var anotherBlogPostId = Guid.NewGuid();
+
+        var anotherBlogPost = new NewBlogPost("title_2", "content", "author", "category_1", new[] { "tag_2" });
+
+        await blogPostsService.NewAsync(anotherBlogPostId, anotherBlogPost);
+
+        var moreBlogPostId = Guid.NewGuid();
+
+        var moreBlogPosts = new NewBlogPost("title_3", "content", "author", "category_2", new[] { "tag_2" });
+
+        await blogPostsService.NewAsync(moreBlogPostId, moreBlogPosts);
+
+        var search = new SearchBlogPostsFilters(null, new[] { "tag_3" }, null);
+
+        var blogPostsFound = await sut.SearchBlogPostsAsync(search);
+
+        Assert.That(blogPostsFound, Has.Count.EqualTo(1));
+    }
 }

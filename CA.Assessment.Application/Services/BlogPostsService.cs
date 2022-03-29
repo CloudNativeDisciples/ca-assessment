@@ -86,6 +86,8 @@ internal sealed class BlogPostService : IBlogPostsService
     {
         if (updateBlogPostData is null) throw new ArgumentNullException(nameof(updateBlogPostData));
 
+        await updateBlogPostValidator.ValidateAndThrowAsync(updateBlogPostData);
+
         await databaseSessionManager.BeginTransactionAsync();
 
         var maybeOriginalBlogPost = await blogPostRepository.GetAsync(blogPostId);
@@ -136,7 +138,7 @@ internal sealed class BlogPostService : IBlogPostsService
         }
     }
 
-    public async Task<BlogPostDetails?> GetAsync(Guid blogPostIdentity)
+    public async Task<BlogPostDetail?> GetAsync(Guid blogPostIdentity)
     {
         await databaseSessionManager.OpenConnectionAsync();
 
