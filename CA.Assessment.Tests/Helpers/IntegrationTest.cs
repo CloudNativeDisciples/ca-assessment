@@ -8,18 +8,16 @@ using CA.Assessment.Infrastructure.Extensions;
 using CA.Assessment.Store.Extensions;
 using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using NUnit.Framework;
 
 namespace CA.Assessment.Tests.Helpers;
 
 public abstract class IntegrationTest
 {
-    private ServiceProvider? serviceProvider;
+    private string? currentDatabaseName;
     private IServiceScope? currentServiceProviderScope;
     private CurrentUserKindTestProvider currentUserKindProvider;
-
-    private string? currentDatabaseName;
+    private ServiceProvider? serviceProvider;
 
     [SetUp]
     public void SetUp()
@@ -59,10 +57,7 @@ public abstract class IntegrationTest
 
         try
         {
-            if (currentDatabaseName is not null)
-            {
-                File.Delete(currentDatabaseName);
-            }
+            if (currentDatabaseName is not null) File.Delete(currentDatabaseName);
         }
         catch
         {
@@ -73,9 +68,7 @@ public abstract class IntegrationTest
     public TService Resolve<TService>()
     {
         if (currentServiceProviderScope is null)
-        {
             throw new InvalidOperationException("You must call SetUp() before resolving services");
-        }
 
         return currentServiceProviderScope.ServiceProvider.GetRequiredService<TService>();
     }

@@ -14,10 +14,7 @@ public sealed class TagsMaker : ITagsMaker
 
     public async Task<IEnumerable<Tag>> GetOrCreateTagsByNameAsync(IEnumerable<string> tagNames)
     {
-        if (tagNames is null)
-        {
-            throw new ArgumentNullException(nameof(tagNames));
-        }
+        if (tagNames is null) throw new ArgumentNullException(nameof(tagNames));
 
         var existingTags = await tagsRepository.GetTagsByNameAsync(tagNames);
 

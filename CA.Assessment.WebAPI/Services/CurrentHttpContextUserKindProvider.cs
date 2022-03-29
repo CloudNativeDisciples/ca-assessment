@@ -16,10 +16,7 @@ public sealed class CurrentHttpContextUserKindProvider : ICurrentUserKindProvide
 
     public Task<UserKind> GetUserKindAsync()
     {
-        if (httpContextAccessor.HttpContext is null)
-        {
-            return Task.FromResult(UserKind.Unknown);
-        }
+        if (httpContextAccessor.HttpContext is null) return Task.FromResult(UserKind.Unknown);
 
         var xUserHeaderValue = httpContextAccessor.HttpContext.Request.Headers[X_USER_HEADER];
         var xUserRawValue = xUserHeaderValue.SingleOrDefault() ?? string.Empty;
@@ -29,10 +26,7 @@ public sealed class CurrentHttpContextUserKindProvider : ICurrentUserKindProvide
         {
             var isAdminUser = string.Equals(X_USER_ADMIN_VALUE, xUserRawValue, StringComparison.OrdinalIgnoreCase);
 
-            if (isAdminUser)
-            {
-                return Task.FromResult(UserKind.Admin);
-            }
+            if (isAdminUser) return Task.FromResult(UserKind.Admin);
 
             return Task.FromResult(UserKind.User);
         }

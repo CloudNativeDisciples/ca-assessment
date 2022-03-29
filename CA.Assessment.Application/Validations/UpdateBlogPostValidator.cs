@@ -5,5 +5,4 @@ namespace CA.Assessment.Application.Validations;
 
 public class UpdateBlogPostValidator : AbstractValidator<UpdateBlogPost>
 {
-
 }

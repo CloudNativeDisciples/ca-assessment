@@ -9,8 +9,8 @@ namespace CA.Assessment.Infrastructure.Repositories;
 
 internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
 {
-    private readonly IDatabaseSession databaseSession;
     private readonly BlogPostRowsMapper blogPostRowsMapper;
+    private readonly IDatabaseSession databaseSession;
 
     public SQLiteBlogPostRepository(IDatabaseSession databaseSession, BlogPostRowsMapper blogPostRowsMapper)
     {
@@ -23,16 +23,12 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
         if (blogPost is null) throw new ArgumentNullException(nameof(blogPost));
 
         if (databaseSession.Connection is null)
-        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
-        }
 
         if (databaseSession.Transaction is null)
-        {
             throw new InvalidOperationException(
                 "No transaction in the database session. You must start a transaction before calling repository methods");
-        }
 
         var insertBlogPostQuery = @"
             INSERT INTO blog_posts(id, author, title, content, image_id, category_id)
@@ -50,8 +46,8 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
         };
 
         await databaseSession.Connection.ExecuteAsync(insertBlogPostQuery,
-            param: insertBlogPostParams,
-            transaction: databaseSession.Transaction);
+            insertBlogPostParams,
+            databaseSession.Transaction);
 
         await SaveTagsToBlogPostAsync(blogPost);
     }
@@ -59,10 +55,8 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
     public async Task<BlogPost?> GetAsync(Guid blogPostIdentity)
     {
         if (databaseSession.Connection is null)
-        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
-        }
 
         var blogPostQuery = @"
             SELECT id, author, content, title, image_id AS ImageId, category_id AS CategoryId
@@ -76,13 +70,10 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
         };
 
         var blogPostRow = await databaseSession.Connection.QueryFirstOrDefaultAsync<BlogPostRow>(blogPostQuery,
-            param: blogPostQueryParams,
-            transaction: databaseSession.Transaction);
+            blogPostQueryParams,
+            databaseSession.Transaction);
 
-        if (blogPostRow is null)
-        {
-            return null;
-        }
+        if (blogPostRow is null) return null;
 
         var blogPostTagsQuery = @"
             SELECT blog_post_id AS BlogPostId, tag_id AS TagId
@@ -96,8 +87,8 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
         };
 
         var blogPostTagRows = databaseSession.Connection.Query<BlogPostToTagRow>(blogPostTagsQuery,
-            param: blogPostTagsQueryParams,
-            transaction: databaseSession.Transaction);
+            blogPostTagsQueryParams,
+            databaseSession.Transaction);
 
         return blogPostRowsMapper.MapOne(blogPostRow, blogPostTagRows);
     }
@@ -105,16 +96,12 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
     public async Task DeleteAsync(Guid blogPostIdentity)
     {
         if (databaseSession.Connection is null)
-        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
-        }
 
         if (databaseSession.Transaction is null)
-        {
             throw new InvalidOperationException(
                 "No transaction in the database session. You must start a transaction before calling repository methods");
-        }
 
         var deleteBlogPostQuery = @"
             DELETE FROM blog_posts
@@ -137,12 +124,12 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
         };
 
         await databaseSession.Connection.ExecuteAsync(deleteBlogPostsToTagsQuery,
-            param: deleteBlogPostsToTagsQueryParams,
-            transaction: databaseSession.Transaction);
+            deleteBlogPostsToTagsQueryParams,
+            databaseSession.Transaction);
 
         await databaseSession.Connection.ExecuteAsync(deleteBlogPostQuery,
-            param: deleteBlogPostQueryParams,
-            transaction: databaseSession.Transaction);
+            deleteBlogPostQueryParams,
+            databaseSession.Transaction);
     }
 
     public async Task UpdateAsync(BlogPost blogPost)
@@ -150,16 +137,12 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
         if (blogPost is null) throw new ArgumentNullException(nameof(blogPost));
 
         if (databaseSession.Connection is null)
-        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
-        }
 
         if (databaseSession.Transaction is null)
-        {
             throw new InvalidOperationException(
                 "No transaction in the database session. You must start a transaction before calling repository methods");
-        }
 
         //It's easier to delete all the N-to-N tuples from the table than trying to reconcile them without an ORM
         await DeleteTagsFromBlogPostAsync(blogPost);
@@ -181,8 +164,8 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
         };
 
         await databaseSession.Connection.ExecuteAsync(query,
-            param: queryParams,
-            transaction: databaseSession.Transaction);
+            queryParams,
+            databaseSession.Transaction);
     }
 
     private async Task DeleteTagsFromBlogPostAsync(BlogPost blogPost)
@@ -190,16 +173,12 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
         if (blogPost is null) throw new ArgumentNullException(nameof(blogPost));
 
         if (databaseSession.Connection is null)
-        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
-        }
 
         if (databaseSession.Transaction is null)
-        {
             throw new InvalidOperationException(
                 "No transaction in the database session. You must start a transaction before calling repository methods");
-        }
 
         var query = @"
             DELETE FROM blog_posts_to_tags
@@ -212,8 +191,8 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
         };
 
         await databaseSession.Connection.ExecuteAsync(query,
-            param: queryParams,
-            transaction: databaseSession.Transaction);
+            queryParams,
+            databaseSession.Transaction);
     }
 
     private async Task SaveTagsToBlogPostAsync(BlogPost blogPost)
@@ -221,16 +200,12 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
         if (blogPost is null) throw new ArgumentNullException(nameof(blogPost));
 
         if (databaseSession.Connection is null)
-        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
-        }
 
         if (databaseSession.Transaction is null)
-        {
             throw new InvalidOperationException(
                 "No transaction in the database session. You must start a transaction before calling repository methods");
-        }
 
         var insertTagsQuery = @"
             INSERT INTO blog_posts_to_tags(blog_post_id, tag_id)
@@ -242,7 +217,7 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
             .ToList();
 
         await databaseSession.Connection.ExecuteAsync(insertTagsQuery,
-            param: insertTagsParams,
-            transaction: databaseSession.Transaction);
+            insertTagsParams,
+            databaseSession.Transaction);
     }
 }

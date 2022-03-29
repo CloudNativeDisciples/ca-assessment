@@ -7,15 +7,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="FluentMigrator" Version="3.3.2" />
-      <PackageReference Include="FluentMigrator.Runner" Version="3.3.2" />
-      <PackageReference Include="FluentMigrator.Runner.SQLite" Version="3.3.2" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-      <PackageReference Include="System.Data.SQLite" Version="1.0.115.5" />
+        <PackageReference Include="FluentMigrator" Version="3.3.2"/>
+        <PackageReference Include="FluentMigrator.Runner" Version="3.3.2"/>
+        <PackageReference Include="FluentMigrator.Runner.SQLite" Version="3.3.2"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0"/>
+        <PackageReference Include="System.Data.SQLite" Version="1.0.115.5"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CA.Assessment.Database\CA.Assessment.Database.csproj" />
+        <ProjectReference Include="..\CA.Assessment.Database\CA.Assessment.Database.csproj"/>
     </ItemGroup>
 
 </Project>

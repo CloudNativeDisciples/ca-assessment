@@ -23,16 +23,12 @@ internal sealed class SQLiteTagsRepository : ITagsRepository
         if (tagToSave is null) throw new ArgumentNullException(nameof(tagToSave));
 
         if (databaseSession.Connection is null)
-        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
-        }
 
         if (databaseSession.Transaction is null)
-        {
             throw new InvalidOperationException(
                 "No transaction in the database session. You must start a transaction before calling repository methods");
-        }
 
         var query = @"
             INSERT INTO tags(id, name)
@@ -46,17 +42,15 @@ internal sealed class SQLiteTagsRepository : ITagsRepository
         };
 
         await databaseSession.Connection.ExecuteAsync(query,
-            param: queryParams,
-            transaction: databaseSession.Transaction);
+            queryParams,
+            databaseSession.Transaction);
     }
 
     public async Task<IEnumerable<Tag>> GetTagsByNameAsync(IEnumerable<string> tagNames)
     {
         if (databaseSession.Connection is null)
-        {
             throw new InvalidOperationException(
                 "You must open a connection in the current database session before calling repository methods");
-        }
 
         var query = @"
             SELECT id, name
@@ -70,8 +64,8 @@ internal sealed class SQLiteTagsRepository : ITagsRepository
         };
 
         var tagRows = await databaseSession.Connection.QueryAsync<TagRow>(query,
-            param: queryParams,
-            transaction: databaseSession.Transaction);
+            queryParams,
+            databaseSession.Transaction);
 
         return tagRowsMapper.MapMany(tagRows);
     }
@@ -79,10 +73,8 @@ internal sealed class SQLiteTagsRepository : ITagsRepository
     public async Task<IEnumerable<Tag>> GetManyAsync(IEnumerable<Guid> tagIds)
     {
         if (databaseSession.Connection is null)
-        {
             throw new InvalidOperationException(
                 "You must open a connection in the current database session before calling repository methods");
-        }
 
         var query = @"
             SELECT id, name
@@ -96,8 +88,8 @@ internal sealed class SQLiteTagsRepository : ITagsRepository
         };
 
         var tagRows = await databaseSession.Connection.QueryAsync<TagRow>(query,
-            param: queryParams,
-            transaction: databaseSession.Transaction);
+            queryParams,
+            databaseSession.Transaction);
 
         return tagRowsMapper.MapMany(tagRows);
     }

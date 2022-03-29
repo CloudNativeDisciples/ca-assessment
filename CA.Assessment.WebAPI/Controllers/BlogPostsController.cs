@@ -1,6 +1,5 @@
 using CA.Assessment.Application.Dtos;
 using CA.Assessment.Application.Services;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CA.Assessment.WebAPI.Controllers;
@@ -19,10 +18,7 @@ public class BlogPostsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> NewBlogPostAsync([FromBody] NewBlogPost? newBlogPost)
     {
-        if (newBlogPost is null)
-        {
-            return BadRequest();
-        }
+        if (newBlogPost is null) return BadRequest();
 
         var newBlogPostId = Guid.NewGuid();
 
@@ -36,10 +32,7 @@ public class BlogPostsController : ControllerBase
     {
         var maybeBlogPost = await blogPostsService.GetAsync(blogPostId);
 
-        if (maybeBlogPost is null)
-        {
-            return NotFound();
-        }
+        if (maybeBlogPost is null) return NotFound();
 
         return Ok(maybeBlogPost);
     }
@@ -57,10 +50,7 @@ public class BlogPostsController : ControllerBase
         [FromRoute] Guid blogPostId,
         [FromBody] UpdateBlogPost? updateBlogPost)
     {
-        if (updateBlogPost is null)
-        {
-            return BadRequest();
-        }
+        if (updateBlogPost is null) return BadRequest();
 
         await blogPostsService.UpdateAsync(blogPostId, updateBlogPost);
 

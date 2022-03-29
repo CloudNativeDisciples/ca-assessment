@@ -7,8 +7,8 @@ namespace CA.Assessment.Application.Mappers;
 
 internal sealed class BlogPostMapper
 {
-    private readonly ITagsRepository tagsRepository;
     private readonly ICategoryRepository categoryRepository;
+    private readonly ITagsRepository tagsRepository;
 
     public BlogPostMapper(ITagsRepository tagsRepository, ICategoryRepository categoryRepository)
     {
@@ -22,10 +22,7 @@ internal sealed class BlogPostMapper
 
         var blogPostCategory = await categoryRepository.GetAsync(blogPost.Category);
 
-        if (blogPostCategory is null)
-        {
-            throw new MissingCategoryException(blogPost.Category);
-        }
+        if (blogPostCategory is null) throw new MissingCategoryException(blogPost.Category);
 
         var tags = await tagsRepository.GetManyAsync(blogPost.Tags);
 

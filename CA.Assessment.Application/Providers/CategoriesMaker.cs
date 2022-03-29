@@ -15,17 +15,11 @@ public sealed class CategoriesMaker : ICategoriesMaker
 
     public async Task<Category> GetOrCreateCategoryByNameAsync(string categoryName)
     {
-        if (categoryName is null)
-        {
-            throw new ArgumentNullException(nameof(categoryName));
-        }
+        if (categoryName is null) throw new ArgumentNullException(nameof(categoryName));
 
         var maybeExistingCategory = await categoriesRepository.GetByNameAsync(categoryName);
 
-        if (maybeExistingCategory is not null)
-        {
-            return maybeExistingCategory;
-        }
+        if (maybeExistingCategory is not null) return maybeExistingCategory;
 
         var blogPostCategory = new Category(Guid.NewGuid(), categoryName);
 

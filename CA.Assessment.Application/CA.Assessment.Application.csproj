@@ -7,13 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CA.Assessment.Database\CA.Assessment.Database.csproj" />
-      <ProjectReference Include="..\CA.Assessment.Domain.Anemic\CA.Assessment.Domain.Anemic.csproj" />
+        <ProjectReference Include="..\CA.Assessment.Database\CA.Assessment.Database.csproj"/>
+        <ProjectReference Include="..\CA.Assessment.Domain.Anemic\CA.Assessment.Domain.Anemic.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="FluentValidation" Version="10.4.0" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+        <PackageReference Include="FluentValidation" Version="10.4.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0"/>
     </ItemGroup>
 
 </Project>

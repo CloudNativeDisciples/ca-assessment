@@ -5,8 +5,6 @@ namespace CA.Assessment.Domain.Anemic.Exceptions;
 [Serializable]
 public sealed class MissingCategoryException : AssessmentDomainException
 {
-    public Guid MissingCategoryIdentity { get; }
-
     private MissingCategoryException()
     {
     }
@@ -21,4 +19,6 @@ public sealed class MissingCategoryException : AssessmentDomainException
         StreamingContext context) : base(info, context)
     {
     }
+
+    public Guid MissingCategoryIdentity { get; }
 }

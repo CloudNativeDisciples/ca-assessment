@@ -1,4 +1,3 @@
-using System.Data;
 using CA.Assessment.Domain.Anemic;
 
 namespace CA.Assessment.Application.Repositories;

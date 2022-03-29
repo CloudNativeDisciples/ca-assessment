@@ -2,7 +2,8 @@ namespace CA.Assessment.Domain.Anemic;
 
 public sealed class BlogPost
 {
-    public BlogPost(Guid identity,
+    public BlogPost(
+        Guid identity,
         string title,
         string author,
         string content,

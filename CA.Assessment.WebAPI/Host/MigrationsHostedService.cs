@@ -1,4 +1,3 @@
-using CA.Assessment.Store;
 using FluentMigrator.Runner;
 
 namespace CA.Assessment.WebAPI.Host;

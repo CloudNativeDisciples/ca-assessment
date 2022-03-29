@@ -1,6 +1,4 @@
-﻿using System.Data.Common;
-using CA.Assessment.Application.Dtos;
-using CA.Assessment.Application.Factories;
+﻿using CA.Assessment.Application.Dtos;
 using CA.Assessment.Application.Mappers;
 using CA.Assessment.Application.Providers;
 using CA.Assessment.Application.Repositories;
@@ -13,14 +11,14 @@ namespace CA.Assessment.Application.Services;
 
 internal sealed class BlogPostService : IBlogPostsService
 {
-    private readonly IBlogPostRepository blogPostRepository;
-    private readonly IValidator<NewBlogPost> newBlogPostValidator;
-    private readonly IValidator<UpdateBlogPost> updateBlogPostValidator;
-    private readonly IDatabaseSessionManager databaseSessionManager;
     private readonly BlogPostMapper blogPostMapper;
-    private readonly ICurrentUserKindProvider currentUserKindProvider;
-    private readonly ITagsMaker tagsMaker;
+    private readonly IBlogPostRepository blogPostRepository;
     private readonly ICategoriesMaker categoriesMaker;
+    private readonly ICurrentUserKindProvider currentUserKindProvider;
+    private readonly IDatabaseSessionManager databaseSessionManager;
+    private readonly IValidator<NewBlogPost> newBlogPostValidator;
+    private readonly ITagsMaker tagsMaker;
+    private readonly IValidator<UpdateBlogPost> updateBlogPostValidator;
 
     public BlogPostService(
         IBlogPostRepository blogPostRepository,
@@ -55,10 +53,7 @@ internal sealed class BlogPostService : IBlogPostsService
 
     public async Task NewAsync(Guid newBlogPostId, NewBlogPost newBlogPostData)
     {
-        if (newBlogPostData is null)
-        {
-            throw new ArgumentNullException(nameof(newBlogPostData));
-        }
+        if (newBlogPostData is null) throw new ArgumentNullException(nameof(newBlogPostData));
 
         await newBlogPostValidator.ValidateAndThrowAsync(newBlogPostData);
 
@@ -95,10 +90,7 @@ internal sealed class BlogPostService : IBlogPostsService
 
         var maybeOriginalBlogPost = await blogPostRepository.GetAsync(blogPostId);
 
-        if (maybeOriginalBlogPost is null)
-        {
-            throw new BlogPostNotFoundException(blogPostId);
-        }
+        if (maybeOriginalBlogPost is null) throw new BlogPostNotFoundException(blogPostId);
 
         //TODO: Maybe would look nicer encapsulating update logic somewhere more meaningful like IBlogPostUpdater
 
@@ -152,10 +144,7 @@ internal sealed class BlogPostService : IBlogPostsService
         {
             var maybeBlogPost = await blogPostRepository.GetAsync(blogPostIdentity);
 
-            if (maybeBlogPost is null)
-            {
-                return null;
-            }
+            if (maybeBlogPost is null) return null;
 
             return await blogPostMapper.MapOneToBlogPostDetailsAsync(maybeBlogPost);
         }
@@ -169,10 +158,7 @@ internal sealed class BlogPostService : IBlogPostsService
     {
         var currentUserKind = await currentUserKindProvider.GetUserKindAsync();
 
-        if (currentUserKind != UserKind.Admin)
-        {
-            throw new UnauthorizedBlogPostDeletionException();
-        }
+        if (currentUserKind != UserKind.Admin) throw new UnauthorizedBlogPostDeletionException();
 
         await databaseSessionManager.BeginTransactionAsync();
 

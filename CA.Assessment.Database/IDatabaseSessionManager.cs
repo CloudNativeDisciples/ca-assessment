@@ -1,6 +1,4 @@
-﻿using System.Data.Common;
-
-namespace CA.Assessment.Store;
+﻿namespace CA.Assessment.Store;
 
 public interface IDatabaseSessionManager
 {

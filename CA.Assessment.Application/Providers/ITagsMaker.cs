@@ -1,4 +1,3 @@
-using System.Data.Common;
 using CA.Assessment.Domain.Anemic;
 
 namespace CA.Assessment.Application.Providers;

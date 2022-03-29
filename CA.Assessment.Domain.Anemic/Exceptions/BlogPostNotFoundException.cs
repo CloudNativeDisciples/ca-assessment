@@ -5,8 +5,6 @@ namespace CA.Assessment.Domain.Anemic.Exceptions;
 [Serializable]
 public class BlogPostNotFoundException : AssessmentDomainException
 {
-    public Guid NotFoundBlogPostIdentity { get; }
-
     private BlogPostNotFoundException()
     {
     }
@@ -21,4 +19,6 @@ public class BlogPostNotFoundException : AssessmentDomainException
         StreamingContext context) : base(info, context)
     {
     }
+
+    public Guid NotFoundBlogPostIdentity { get; }
 }

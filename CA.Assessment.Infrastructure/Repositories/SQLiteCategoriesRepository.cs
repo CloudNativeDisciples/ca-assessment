@@ -9,8 +9,8 @@ namespace CA.Assessment.Infrastructure.Repositories;
 
 internal sealed class SQLiteCategoriesRepository : ICategoryRepository
 {
-    private readonly IDatabaseSession databaseSession;
     private readonly CategoryRowsMapper categoryRowsMapper;
+    private readonly IDatabaseSession databaseSession;
 
     public SQLiteCategoriesRepository(IDatabaseSession databaseSession, CategoryRowsMapper categoryRowsMapper)
     {
@@ -23,10 +23,8 @@ internal sealed class SQLiteCategoriesRepository : ICategoryRepository
         if (categoryName is null) throw new ArgumentNullException(nameof(categoryName));
 
         if (databaseSession.Connection is null)
-        {
             throw new InvalidOperationException(
                 "You must open a connection in the current database session before calling repository methods");
-        }
 
         var query = @"
             SELECT id, name
@@ -40,13 +38,10 @@ internal sealed class SQLiteCategoriesRepository : ICategoryRepository
         };
 
         var categoryRow = await databaseSession.Connection.QuerySingleOrDefaultAsync<CategoryRow>(query,
-            param: queryParams,
-            transaction: databaseSession.Transaction);
+            queryParams,
+            databaseSession.Transaction);
 
-        if (categoryRow is null)
-        {
-            return null;
-        }
+        if (categoryRow is null) return null;
 
         return categoryRowsMapper.MapOne(categoryRow);
     }
@@ -56,16 +51,12 @@ internal sealed class SQLiteCategoriesRepository : ICategoryRepository
         if (category is null) throw new ArgumentNullException(nameof(category));
 
         if (databaseSession.Connection is null)
-        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
-        }
 
         if (databaseSession.Transaction is null)
-        {
             throw new InvalidOperationException(
                 "No transaction in the database session. You must start a transaction before calling repository methods");
-        }
 
         var query = @"
             INSERT INTO categories(id, name)
@@ -79,17 +70,15 @@ internal sealed class SQLiteCategoriesRepository : ICategoryRepository
         };
 
         await databaseSession.Connection.ExecuteAsync(query,
-            param: queryParams,
-            transaction: databaseSession.Transaction);
+            queryParams,
+            databaseSession.Transaction);
     }
 
     public async Task<Category?> GetAsync(Guid categoryId)
     {
         if (databaseSession.Connection is null)
-        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
-        }
 
         var query = @"
             SELECT *
@@ -103,13 +92,10 @@ internal sealed class SQLiteCategoriesRepository : ICategoryRepository
         };
 
         var maybeCategory = await databaseSession.Connection.QueryFirstOrDefaultAsync<CategoryRow>(query,
-            param: queryParams,
-            transaction: databaseSession.Transaction);
+            queryParams,
+            databaseSession.Transaction);
 
-        if (maybeCategory is null)
-        {
-            return null;
-        }
+        if (maybeCategory is null) return null;
 
         return categoryRowsMapper.MapOne(maybeCategory);
     }
