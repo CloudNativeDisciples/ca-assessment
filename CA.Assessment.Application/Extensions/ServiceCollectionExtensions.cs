@@ -19,6 +19,7 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddTransient<IBlogPostsService, BlogPostService>();
         serviceCollection.AddTransient<ISearchService, SearchService>();
+        serviceCollection.AddTransient<ITagsService, TagsService>();
 
         serviceCollection.AddTransient<IValidator<NewBlogPost>, NewBlogPostValidator>();
         serviceCollection.AddTransient<IValidator<UpdateBlogPost>, UpdateBlogPostValidator>();

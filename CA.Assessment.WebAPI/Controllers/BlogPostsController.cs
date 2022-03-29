@@ -10,11 +10,16 @@ public class BlogPostsController : ControllerBase
 {
     private readonly IBlogPostsService blogPostsService;
     private readonly ISearchService searchService;
+    private readonly ITagsService tagsService;
 
-    public BlogPostsController(IBlogPostsService blogPostsService, ISearchService searchService)
+    public BlogPostsController(
+        IBlogPostsService blogPostsService,
+        ISearchService searchService,
+        ITagsService tagsService)
     {
         this.blogPostsService = blogPostsService ?? throw new ArgumentNullException(nameof(blogPostsService));
         this.searchService = searchService ?? throw new ArgumentNullException(nameof(searchService));
+        this.tagsService = tagsService ?? throw new ArgumentNullException(nameof(tagsService));
     }
 
     [HttpPost]
@@ -69,19 +74,26 @@ public class BlogPostsController : ControllerBase
         return Ok(searchResults);
     }
 
-    [HttpDelete("tags/{blogPostId}")]
-    public async Task<IActionResult> RemoveTagsAsync()
+    [HttpDelete("{blogPostId}/tags")]
+    public async Task<IActionResult> RemoveTagsAsync([FromRoute] Guid blogPostId, [FromBody] IEnumerable<string>? tags)
     {
         return Ok();
     }
 
-    [HttpPut("tags/{blogPostId}")]
-    public async Task<IActionResult> AddTagsAsync()
+    [HttpPut("{blogPostId}/tags")]
+    public async Task<IActionResult> AddTagsAsync([FromRoute] Guid blogPostId, [FromBody] IEnumerable<string>? tags)
     {
+        if (tags is null)
+        {
+            return BadRequest();
+        }
+
+        await tagsService.TagAsync(blogPostId, tags);
+
         return Ok();
     }
 
-    [HttpPost("images")]
+    [HttpPost("{blogPostId}/images")]
     public async Task<IActionResult> UploadImageAsync()
     {
         return Ok();

@@ -93,4 +93,56 @@ internal sealed class SQLiteTagsRepository : ITagsRepository
 
         return tagRowsMapper.MapMany(tagRows);
     }
+
+    public async Task AddTagsToBlogPostAsync(Guid blogPostId, IEnumerable<Tag> tagsToAdd)
+    {
+        if (tagsToAdd is null) throw new ArgumentNullException(nameof(tagsToAdd));
+
+        if (databaseSession.Connection is null)
+            throw new InvalidOperationException(
+                "No connection in the database session. You must open a connection before calling repository methods");
+
+        if (databaseSession.Transaction is null)
+            throw new InvalidOperationException(
+                "No transaction in the database session. You must start a transaction before calling repository methods");
+
+        var query = @"
+            INSERT INTO blog_posts_to_tags(blog_post_id, tag_id)
+            VALUES (@BlogPostId, @TagId)
+        ";
+
+        var queryParams =
+            tagsToAdd.Select(t => new { TagId = t.Identity.ToString(), BlogPostId = blogPostId.ToString() })
+                .ToList();
+
+        await databaseSession.Connection.ExecuteAsync(query,
+            param: queryParams,
+            transaction: databaseSession.Transaction);
+    }
+
+    public async Task RemoveTagsToBlogPostAsync(Guid blogPostId, IEnumerable<Tag> tagsToRemove)
+    {
+        if (tagsToRemove is null) throw new ArgumentNullException(nameof(tagsToRemove));
+
+        if (databaseSession.Connection is null)
+            throw new InvalidOperationException(
+                "No connection in the database session. You must open a connection before calling repository methods");
+
+        if (databaseSession.Transaction is null)
+            throw new InvalidOperationException(
+                "No transaction in the database session. You must start a transaction before calling repository methods");
+
+        var query = @"
+            DELETE FROM blog_posts_to_tags
+            WHERE blog_post_id = @BlogPostId AND tag_id = @TagId
+        ";
+
+        var queryParams =
+            tagsToRemove.Select(t => new { TagId = t.Identity.ToString(), BlogPostId = blogPostId.ToString() })
+                .ToList();
+
+        await databaseSession.Connection.ExecuteAsync(query,
+            param: queryParams,
+            transaction: databaseSession.Transaction);
+    }
 }

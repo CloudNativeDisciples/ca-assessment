@@ -142,6 +142,56 @@ public class BlogPostTest : IntegrationTest
 
         var blogPostsFound = await sut.SearchBlogPostsAsync(search);
 
-        Assert.That(blogPostsFound, Has.Count.EqualTo(1));
+        var blogPostsList = blogPostsFound.ToList();
+
+        Assert.That(blogPostsList, Has.Count.EqualTo(1));
+        Assert.That(blogPostsList[0].Title, Is.EqualTo("title_1"));
+    }
+
+    [Test]
+    public async Task Blog_posts_can_be_tagged()
+    {
+        var sut = Resolve<ITagsService>();
+
+        var blogPostsService = Resolve<IBlogPostsService>();
+
+        var newBlogPostId = Guid.NewGuid();
+
+        var newBlogPostRequest = new NewBlogPost("title_1", "content", "author", "category_2", new[] { "tag_3" });
+
+        await blogPostsService.NewAsync(newBlogPostId, newBlogPostRequest);
+
+        await sut.TagAsync(newBlogPostId, new[] { "tag_1", "tag_2" });
+
+        var blogPost = await blogPostsService.GetAsync(newBlogPostId);
+
+        var tagNames = blogPost!.Tags.Select(t => t.Name).ToList();
+
+        Assert.That(tagNames, Has.Count.EqualTo(3));
+        Assert.That(tagNames, Is.EquivalentTo(new[] { "tag_1", "tag_2", "tag_3" }));
+    }
+
+    [Test]
+    public async Task Blog_posts_can_be_untagged()
+    {
+        var sut = Resolve<ITagsService>();
+
+        var blogPostsService = Resolve<IBlogPostsService>();
+
+        var newBlogPostId = Guid.NewGuid();
+
+        var newBlogPostRequest = new NewBlogPost("title_1", "content", "author", "category_2",
+            new[] { "tag_1", "tag_2", "tag_3" });
+
+        await blogPostsService.NewAsync(newBlogPostId, newBlogPostRequest);
+
+        await sut.UntagAsync(newBlogPostId, new[] { "tag_1", "tag_2" });
+
+        var blogPost = await blogPostsService.GetAsync(newBlogPostId);
+
+        var tagNames = blogPost!.Tags.Select(t => t.Name).ToList();
+
+        Assert.That(tagNames, Has.Count.EqualTo(1));
+        Assert.That(tagNames, Is.EquivalentTo(new[] { "tag_3" }));
     }
 }
