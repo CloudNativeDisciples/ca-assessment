@@ -54,7 +54,7 @@ Codecov currently reported coverage is 72.65%.
 The API is available under: `api/v1/blog-posts` and it exposes the endpoints detailed below.  
 All the endpoints except `POST api/v1/blog-posts/<blog_post_id>/images` expect an `application/json` payload.
 
-`POST   api/v1/blog-posts`
+`POST   api/v1/blog-posts`  
 Creates a new Blog Post and returns the Blog Post id just created.  
 It expects a JSON payload similar to:
 
@@ -74,14 +74,14 @@ It expects a JSON payload similar to:
 All the properties are required.  
 Any tag or category that does not exist is created on the fly. Tag and category names are case-sensitive.
 
-`GET    api/v1/blog-posts/<blog_post_id>`
+`GET    api/v1/blog-posts/<blog_post_id>`  
 Gets the Blog Post with the id specified, if it exists.
 
-`DELETE api/v1/blog-posts/<blog_post_id>`
+`DELETE api/v1/blog-posts/<blog_post_id>`  
 Deletes the Blog Post with the id specified, if it exists and the user has specified `X-User`: `Admin` in the request
 headers.
 
-`PATCH  api/v1/blog-posts/<blog_post_id>`
+`PATCH  api/v1/blog-posts/<blog_post_id>`  
 Partially updates the Blog Post with the id specified, if it exists.
 
 It expects a JSON payload similar to:
@@ -102,7 +102,7 @@ It expects a JSON payload similar to:
 None of the properties is required.  
 Any tag or category that does not exist is created on the fly. Tag and category names are case-sensitive.
 
-`POST   api/v1/blog-posts/search`
+`POST   api/v1/blog-posts/search`  
 Searches Blog Posts that match the filters specified.
 
 It expects a JSON payload similar to:
@@ -121,7 +121,7 @@ It expects a JSON payload similar to:
 None of the properties is required.  
 Tag and category names are case-sensitive.
 
-`DELETE api/v1/blog-posts/<blog_post_id>/tags`
+`DELETE api/v1/blog-posts/<blog_post_id>/tags`  
 Removes the tags specified from the blog post specified, if it exists.
 
 It expects a JSON payload similar to:
@@ -136,7 +136,7 @@ It expects a JSON payload similar to:
 The array is required.  
 Tag names are case-sensitive.
 
-`PUT    api/v1/blog-posts/<blog_post_id>/tags`
+`PUT    api/v1/blog-posts/<blog_post_id>/tags`  
 Add the tags specified from the blog post specified, if it exists.
 
 It expects a JSON payload similar to:
@@ -151,11 +151,11 @@ It expects a JSON payload similar to:
 The array is required.  
 Tag names are case-sensitive.
 
-`POST    api/v1/blog-posts/<blog_post_id>/images`
+`POST    api/v1/blog-posts/<blog_post_id>/images`  
 Add the image specified to the blog post specified, if it exists.   
 It expects an `application/x-www-form-urlencoded` with one file property called `image`.  
 The `image` file property is required.
 
-`GET    api/v1/blog-posts/<blog_post_id>/images/<image_id>`
+`GET    api/v1/blog-posts/<blog_post_id>/images/<image_id>`  
 Returns the image specified of the blog post specified, if it exists.  
 This call returns an image file.
