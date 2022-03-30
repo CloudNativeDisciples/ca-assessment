@@ -54,7 +54,7 @@ public class BlogPostsController : ControllerBase
     {
         await blogPostsService.DeleteAsync(blogPostId);
 
-        return Ok();
+        return NoContent();
     }
 
     [HttpPatch("{blogPostId}")]
@@ -66,7 +66,7 @@ public class BlogPostsController : ControllerBase
 
         await blogPostsService.UpdateAsync(blogPostId, updateBlogPost);
 
-        return Ok();
+        return NoContent();
     }
 
     [HttpPost("search")]
@@ -89,7 +89,7 @@ public class BlogPostsController : ControllerBase
 
         await tagsService.UntagAsync(blogPostId, tags);
 
-        return Ok();
+        return NoContent();
     }
 
     [HttpPut("{blogPostId}/tags")]
@@ -99,7 +99,7 @@ public class BlogPostsController : ControllerBase
 
         await tagsService.TagAsync(blogPostId, tags);
 
-        return Ok();
+        return NoContent();
     }
 
     [HttpPost("{blogPostId}/images")]
@@ -124,7 +124,7 @@ public class BlogPostsController : ControllerBase
 
         await imageService.AttachImageToBlogPostAsync(newImageId, blogPostId, newBlogPostImage);
 
-        return Ok();
+        return Ok(newImageId);
     }
 
     [HttpGet("{blogPostId}/images/{imageId}")]

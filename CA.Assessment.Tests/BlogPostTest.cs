@@ -211,7 +211,7 @@ public class BlogPostTest : IntegrationTest
 
         await blogPostsService.NewAsync(newBlogPostId, newBlogPostRequest);
 
-        var newBlogPostImage = new NewBlogPostImage("test", "image/png", new byte[4] { 15, 14, 13, 14 });
+        var newBlogPostImage = new NewBlogPostImage("test", "image/png", new byte[] { 15, 14, 13, 14 });
 
         await sut.AttachImageToBlogPostAsync(newImageId, newBlogPostId, newBlogPostImage);
 
