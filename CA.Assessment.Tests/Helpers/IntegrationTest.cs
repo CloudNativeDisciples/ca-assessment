@@ -17,8 +17,8 @@ public abstract class IntegrationTest
     private string? currentDatabaseName;
     private IServiceScope? currentServiceProviderScope;
     private CurrentUserKindTestProvider? currentUserKindProvider;
-    private ServiceProvider? serviceProvider;
     private string? imageStoreFolder;
+    private ServiceProvider? serviceProvider;
 
     [SetUp]
     public void SetUp()

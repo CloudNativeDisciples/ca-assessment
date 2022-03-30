@@ -16,10 +16,7 @@ public static class BinaryReaderExtensions
         {
             bytesRead = binaryReader.Read(buffer, 0, 4096);
 
-            if (bytesRead != 0)
-            {
-                await memoryStream.WriteAsync(buffer, 0, bytesRead);
-            }
+            if (bytesRead != 0) await memoryStream.WriteAsync(buffer, 0, bytesRead);
         }
         while (bytesRead != 0);
 

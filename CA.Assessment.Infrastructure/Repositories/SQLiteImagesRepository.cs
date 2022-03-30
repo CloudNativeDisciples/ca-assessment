@@ -11,8 +11,8 @@ namespace CA.Assessment.Infrastructure.Repositories;
 internal sealed class SQLiteImagesRepository : IImagesRepository
 {
     private readonly IDatabaseSession databaseSession;
-    private readonly ImageStore imageStore;
     private readonly ImageRowsMapper imageRowsMapper;
+    private readonly ImageStore imageStore;
 
     public SQLiteImagesRepository(
         IDatabaseSession databaseSession,
@@ -46,13 +46,13 @@ internal sealed class SQLiteImagesRepository : IImagesRepository
         var queryParams = new
         {
             ImageId = image.Identity.ToString(),
-            Mime = image.Mime,
-            Name = image.Name
+            image.Mime,
+            image.Name
         };
 
         await databaseSession.Connection.ExecuteAsync(query,
-            param: queryParams,
-            transaction: databaseSession.Transaction);
+            queryParams,
+            databaseSession.Transaction);
     }
 
     public async Task<Image?> GetAsync(Guid imageId)
@@ -73,13 +73,10 @@ internal sealed class SQLiteImagesRepository : IImagesRepository
         };
 
         var imageRow = await databaseSession.Connection.QueryFirstOrDefaultAsync<ImageRow>(query,
-            param: queryParams,
-            transaction: databaseSession.Transaction);
+            queryParams,
+            databaseSession.Transaction);
 
-        if (imageRow is null)
-        {
-            return null;
-        }
+        if (imageRow is null) return null;
 
         return await imageRowsMapper.MapOneAsync(imageRow);
     }

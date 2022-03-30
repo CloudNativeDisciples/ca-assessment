@@ -1,4 +1,3 @@
-using System.Net.Mime;
 using CA.Assessment.Application.Dtos;
 using CA.Assessment.Application.Services;
 using CA.Assessment.Infrastructure.Extensions;
@@ -11,9 +10,9 @@ namespace CA.Assessment.WebAPI.Controllers;
 public class BlogPostsController : ControllerBase
 {
     private readonly IBlogPostsService blogPostsService;
+    private readonly IImageService imageService;
     private readonly ISearchService searchService;
     private readonly ITagsService tagsService;
-    private readonly IImageService imageService;
 
     public BlogPostsController(
         IBlogPostsService blogPostsService,
@@ -82,10 +81,7 @@ public class BlogPostsController : ControllerBase
     [HttpDelete("{blogPostId}/tags")]
     public async Task<IActionResult> RemoveTagsAsync([FromRoute] Guid blogPostId, [FromBody] IEnumerable<string>? tags)
     {
-        if (tags is null)
-        {
-            return BadRequest();
-        }
+        if (tags is null) return BadRequest();
 
         await tagsService.UntagAsync(blogPostId, tags);
 
@@ -105,10 +101,7 @@ public class BlogPostsController : ControllerBase
     [HttpPost("{blogPostId}/images")]
     public async Task<IActionResult> UploadImageAsync([FromRoute] Guid blogPostId, [FromForm] IFormFile? image)
     {
-        if (image is null)
-        {
-            return BadRequest();
-        }
+        if (image is null) return BadRequest();
 
         await using var fileStream = image.OpenReadStream();
 

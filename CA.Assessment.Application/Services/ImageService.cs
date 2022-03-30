@@ -1,4 +1,3 @@
-using System.Text;
 using CA.Assessment.Application.Dtos;
 using CA.Assessment.Application.Mappers;
 using CA.Assessment.Application.Repositories;
@@ -39,10 +38,7 @@ internal sealed class ImageService : IImageService
 
         var maybeBlogPost = await blogPostsRepository.GetAsync(blogPostId);
 
-        if (maybeBlogPost is null)
-        {
-            throw new BlogPostNotFoundException(blogPostId);
-        }
+        if (maybeBlogPost is null) throw new BlogPostNotFoundException(blogPostId);
 
         var newImage = new Image(newImageId, newBlogPostImage.Content, newBlogPostImage.Mime, newBlogPostImage.Name);
 
@@ -71,19 +67,13 @@ internal sealed class ImageService : IImageService
 
         var maybeBlogPost = await blogPostsRepository.GetAsync(blogPostId);
 
-        if (maybeBlogPost is null)
-        {
-            throw new BlogPostNotFoundException(blogPostId);
-        }
+        if (maybeBlogPost is null) throw new BlogPostNotFoundException(blogPostId);
 
         try
         {
             var image = await imagesRepository.GetAsync(imageId);
 
-            if (image is null)
-            {
-                throw new BlogPostImageNotFoundException(imageId);
-            }
+            if (image is null) throw new BlogPostImageNotFoundException(imageId);
 
             return imageMapper.MapOneToBlogPostImageData(image);
         }
