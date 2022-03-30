@@ -36,6 +36,8 @@ Once the repository is cloned `cd` into the repository root folder and run `dotn
 By default the application will listen on `http://localhost:8090`.  
 The application data will be written to `/tmp` by default.
 
+Otherwise, you can run the `Dockerfile` provided using 
+
 ### Tests
 
 Once the repository is cloned `cd` into the repository root folder and run `dotnet test`.  

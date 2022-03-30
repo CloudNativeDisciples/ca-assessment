@@ -7,9 +7,10 @@ RUN dotnet publish CA.Assessment.WebAPI --configuration Release --self-contained
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
 EXPOSE 8090
 ENV ASPNETCORE_URLS="http://+:8090"
-ENV CA_ASSESSMENT_DATABASE="Data Source = /ca_assessment/db"
+ENV CA_ASSESSMENT_DATABASE="Data Source = /ca_assessment/data/app.gitdb"
 ENV CA_ASSESSMENT_IMAGE_STORE="/ca_assessment/images/"
 RUN mkdir --parent "/ca_assessment/images" 
+RUN mkdir --parent "/ca_assessment/data" 
 WORKDIR /ca_assessment
 COPY --from=BUILDER /app/output .
 RUN groupadd -r ca_assessment && useradd --no-log-init -r -g ca_assessment ca_assessment
