@@ -1,12 +1,14 @@
 using CA.Assessment.Application.Dtos;
 using CA.Assessment.Application.Services;
 using CA.Assessment.Infrastructure.Extensions;
+using CA.Assessment.WebAPI.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CA.Assessment.WebAPI.Controllers;
 
 [ApiController]
 [Route("api/v1/blog-posts")]
+[TypeFilter(typeof(DomainExceptionFilters))]
 public class BlogPostsController : ControllerBase
 {
     private readonly IBlogPostsService blogPostsService;

@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 namespace CA.Assessment.Domain.Anemic.Exceptions;
 
 [Serializable]
-public class UnauthorizedBlogPostDeletionException : AssessmentDomainException
+public sealed class UnauthorizedBlogPostDeletionException : AssessmentDomainException
 {
     public UnauthorizedBlogPostDeletionException()
     {
@@ -17,7 +17,7 @@ public class UnauthorizedBlogPostDeletionException : AssessmentDomainException
     {
     }
 
-    protected UnauthorizedBlogPostDeletionException(
+    private UnauthorizedBlogPostDeletionException(
         SerializationInfo info,
         StreamingContext context) : base(info, context)
     {

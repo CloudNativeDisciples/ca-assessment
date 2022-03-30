@@ -79,7 +79,7 @@ public class BlogPostTest : IntegrationTest
             await sut.DeleteAsync(newBlogPostId);
         }
 
-        Assert.That(TryDeleteAsync, Throws.InstanceOf<UnauthorizedBlogPostDeletionException>());
+        Assert.That(TryDeleteAsync, Throws.InstanceOf<ForbiddenBlogPostDeletionException>());
 
         var maybeBlogPost = await sut.GetAsync(newBlogPostId);
 

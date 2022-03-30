@@ -160,7 +160,8 @@ internal sealed class BlogPostService : IBlogPostsService
     {
         var currentUserKind = await currentUserKindProvider.GetUserKindAsync();
 
-        if (currentUserKind != UserKind.Admin) throw new UnauthorizedBlogPostDeletionException();
+        if (currentUserKind == UserKind.Unknown) throw new UnauthorizedBlogPostDeletionException();
+        if (currentUserKind == UserKind.User) throw new ForbiddenBlogPostDeletionException();
 
         await databaseSessionManager.BeginTransactionAsync();
 
