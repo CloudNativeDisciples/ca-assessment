@@ -1,0 +1,5 @@
+ignore:
+  - "CA.Assessment.Database.Migrations"
+  - "CA.Assessment.Tests"
+  - "CA.Assessment.WebAPI"
+  - "CA.Assessment.Domain.Anemic"

@@ -3,3 +3,6 @@
 .[iI]dea/
 .user
 .db
+TestResults/
+coverage/
+codecov/
