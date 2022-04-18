@@ -1,6 +1,6 @@
 # Cloud Academy assessment
 
-Cloud Academy assessment for a Senior Backend Engineer role
+Assessment for a Senior Backend Engineer role
 
 ## Overview
 
