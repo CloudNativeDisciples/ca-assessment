@@ -1,6 +1,5 @@
 using CA.Assessment.Application.Dtos;
 using CA.Assessment.Application.Services;
-using CA.Assessment.Infrastructure.Extensions;
 using CA.Assessment.WebAPI.Filters;
 using Microsoft.AspNetCore.Mvc;
 
@@ -121,6 +120,6 @@ public class BlogPostsController : ControllerBase
     {
         var image = await imageService.GetBlogPostImageAsync(blogPostId, imageId);
 
-        return File(image.Content, image.Mime);
+        return File(image.ImageStream, image.Mime);
     }
 }
