@@ -19,7 +19,7 @@ builder.Host.ConfigureAppConfiguration(cfg =>
 });
 
 var databaseConnectionStringValue = configuration.GetSection("Database").Get<string>();
-var imageStoreFolderValue = configuration.GetSection("Image_Store").Get<string>();
+var imageStoreOptions = configuration.GetSection("Image_Store");
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHostedService<MigrationsHostedService>();
@@ -28,7 +28,7 @@ builder.Services.AddTransient<ICurrentUserKindProvider, CurrentHttpContextUserKi
 builder.Services.AddAssessmentDatabase(databaseConnectionStringValue)
     .AddAssessmentMigrations(databaseConnectionStringValue)
     .AddAssessmentApplication()
-    .AddAssessmentInfrastructure(imageStoreFolderValue);
+    .AddAssessmentInfrastructure();
 
 builder.Services.AddControllers();
 

@@ -4,6 +4,7 @@ using CA.Assessment.Application.Extensions;
 using CA.Assessment.Application.Providers;
 using CA.Assessment.Database.Migrations.Extensions;
 using CA.Assessment.Domain.Anemic;
+using CA.Assessment.Images.Extensions;
 using CA.Assessment.Infrastructure.Extensions;
 using CA.Assessment.Store.Extensions;
 using FluentMigrator.Runner;
@@ -14,34 +15,37 @@ namespace CA.Assessment.Tests.Helpers;
 
 public abstract class IntegrationTest
 {
-    private string? currentDatabaseName;
-    private IServiceScope? currentServiceProviderScope;
-    private CurrentUserKindTestProvider? currentUserKindProvider;
-    private string? imageStoreFolder;
-    private ServiceProvider? serviceProvider;
+    private string? _currentDatabaseName;
+    private string? _imageStoreFolder;
+
+    private CurrentUserKindTestProvider? _currentUserKindProvider;
+
+    private IServiceScope? _currentServiceProviderScope;
+    private ServiceProvider? _serviceProvider;
 
     [SetUp]
     public void SetUp()
     {
         var serviceCollection = new ServiceCollection();
 
-        currentDatabaseName = $"{Guid.NewGuid():N}.db";
-        imageStoreFolder = $"{imageStoreFolder}.images";
+        _currentDatabaseName = $"{Guid.NewGuid():N}.db";
+        _imageStoreFolder = $"{_imageStoreFolder}.images";
 
-        var databaseConnectionString = $"Data Source = {currentDatabaseName}";
+        var databaseConnectionString = $"Data Source = {_currentDatabaseName}";
 
         serviceCollection.AddAssessmentMigrations(databaseConnectionString)
             .AddAssessmentDatabase(databaseConnectionString)
             .AddAssessmentApplication()
-            .AddAssessmentInfrastructure(imageStoreFolder);
+            .AddAssessmentInfrastructure()
+            .AddFileSystemImageStore(opts => opts.Folder = _imageStoreFolder);
 
-        currentUserKindProvider = new CurrentUserKindTestProvider();
+        _currentUserKindProvider = new CurrentUserKindTestProvider();
 
-        serviceCollection.AddSingleton<ICurrentUserKindProvider>(currentUserKindProvider);
+        serviceCollection.AddSingleton<ICurrentUserKindProvider>(_currentUserKindProvider);
 
-        serviceProvider = serviceCollection.BuildServiceProvider();
+        _serviceProvider = serviceCollection.BuildServiceProvider();
 
-        currentServiceProviderScope = serviceProvider.CreateScope();
+        _currentServiceProviderScope = _serviceProvider.CreateScope();
 
         var migrator = Resolve<IMigrationRunner>();
 
@@ -51,16 +55,23 @@ public abstract class IntegrationTest
     [TearDown]
     public void TearDown()
     {
-        currentServiceProviderScope?.Dispose();
-        serviceProvider?.Dispose();
+        _currentServiceProviderScope?.Dispose();
+        _serviceProvider?.Dispose();
 
-        currentServiceProviderScope = null;
-        serviceProvider = null;
+        _currentServiceProviderScope = null;
+        _serviceProvider = null;
 
         try
         {
-            if (currentDatabaseName is not null) File.Delete(currentDatabaseName);
-            if (imageStoreFolder is not null) Directory.Delete(imageStoreFolder, true);
+            if (_currentDatabaseName is not null)
+            {
+                File.Delete(_currentDatabaseName);
+            }
+
+            if (_imageStoreFolder is not null)
+            {
+                Directory.Delete(_imageStoreFolder, true);
+            }
         }
         catch
         {
@@ -70,14 +81,19 @@ public abstract class IntegrationTest
 
     protected TService Resolve<TService>() where TService : notnull
     {
-        if (currentServiceProviderScope is null)
+        if (_currentServiceProviderScope is null)
+        {
             throw new InvalidOperationException("You must call SetUp() before resolving services");
+        }
 
-        return currentServiceProviderScope.ServiceProvider.GetRequiredService<TService>();
+        return _currentServiceProviderScope.ServiceProvider.GetRequiredService<TService>();
     }
 
     protected void SetCurrentUserKind(UserKind userKind)
     {
-        if (currentUserKindProvider is not null) currentUserKindProvider.CurrentUserKind = userKind;
+        if (_currentUserKindProvider is not null)
+        {
+            _currentUserKindProvider.CurrentUserKind = userKind;
+        }
     }
 }

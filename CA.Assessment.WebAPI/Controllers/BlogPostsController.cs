@@ -105,17 +105,11 @@ public class BlogPostsController : ControllerBase
     {
         if (image is null) return BadRequest();
 
-        await using var fileStream = image.OpenReadStream();
-
         var newImageId = Guid.NewGuid();
 
         await using var imageStream = image.OpenReadStream();
 
-        using var binaryStream = new BinaryReader(imageStream);
-
-        var imageContents = await binaryStream.ReadAllAsync();
-
-        var newBlogPostImage = new NewBlogPostImage(image.Name, image.ContentType, imageContents);
+        var newBlogPostImage = new NewBlogPostImage(image.Name, image.ContentType, imageStream);
 
         await imageService.AttachImageToBlogPostAsync(newImageId, blogPostId, newBlogPostImage);
 

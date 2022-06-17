@@ -1,14 +1,23 @@
 using CA.Assessment.Application.Dtos;
 using CA.Assessment.Domain.Anemic;
+using CA.Assessment.Images;
 
 namespace CA.Assessment.Application.Mappers;
 
 internal sealed class ImageMapper
 {
-    internal BlogPostImageData MapOneToBlogPostImageData(Image blogPostImage)
+    internal BlogPostImageData MapOneToBlogPostImageData(Image blogPostImage, IImageFromStore imageStream)
     {
-        if (blogPostImage is null) throw new ArgumentNullException(nameof(blogPostImage));
+        if (blogPostImage is null)
+        {
+            throw new ArgumentNullException(nameof(blogPostImage));
+        }
 
-        return new BlogPostImageData(blogPostImage.Content, blogPostImage.Mime);
+        if (imageStream == null)
+        {
+            throw new ArgumentNullException(nameof(imageStream));
+        }
+
+        return new BlogPostImageData(blogPostImage.Mime, imageStream.OpenReadStream());
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CA.Assessment.Application.Dtos;
@@ -211,7 +212,14 @@ public class BlogPostTest : IntegrationTest
 
         await blogPostsService.NewAsync(newBlogPostId, newBlogPostRequest);
 
-        var newBlogPostImage = new NewBlogPostImage("test", "image/png", new byte[] { 15, 14, 13, 14 });
+        using var inMemoryStream = new MemoryStream();
+
+        await inMemoryStream.WriteAsync(new byte[] { 15, 14, 13, 14 });
+        await inMemoryStream.FlushAsync();
+
+        inMemoryStream.Seek(0L, SeekOrigin.Begin);
+
+        var newBlogPostImage = new NewBlogPostImage("test", "image/png", inMemoryStream);
 
         await sut.AttachImageToBlogPostAsync(newImageId, newBlogPostId, newBlogPostImage);
 
@@ -222,7 +230,14 @@ public class BlogPostTest : IntegrationTest
         Assert.That(blogPost!.Image, Is.EqualTo(newImageId));
 
         Assert.That(image, Is.Not.Null);
-        Assert.That(image.Content, Is.EqualTo(new byte[] { 15, 14, 13, 14 }));
+        Assert.That(image.ImageStream, Is.Not.Null);
         Assert.That(image.Mime, Is.EqualTo("image/png"));
+
+        var buffer = new byte[4];
+
+        var bytesRead = await image.ImageStream.ReadAsync(buffer, 0, 4);
+
+        Assert.That(bytesRead, Is.EqualTo(4));
+        Assert.That(buffer, Is.EqualTo(new byte[] { 15, 14, 13, 14 }));
     }
 }
