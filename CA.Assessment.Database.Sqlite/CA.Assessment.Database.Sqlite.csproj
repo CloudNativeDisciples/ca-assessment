@@ -8,7 +8,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\CA.Assessment.Application\CA.Assessment.Application.csproj" />
-        <ProjectReference Include="..\CA.Assessment.Images\CA.Assessment.Images.csproj" />
     </ItemGroup>
 
     <ItemGroup>

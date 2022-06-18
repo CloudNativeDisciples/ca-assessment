@@ -1,14 +1,21 @@
+using CA.Assessment.Database.Sqlite.Rows;
 using CA.Assessment.Domain.Anemic;
-using CA.Assessment.Infrastructure.Rows;
 
-namespace CA.Assessment.Infrastructure.Mappers;
+namespace CA.Assessment.Database.Sqlite.Mappers;
 
 internal sealed class BlogPostRowsMapper
 {
     public BlogPost MapOne(BlogPostRow blogPostRow, IEnumerable<BlogPostToTagRow> blogPostToTagRows)
     {
-        if (blogPostRow is null) throw new ArgumentNullException(nameof(blogPostRow));
-        if (blogPostToTagRows is null) throw new ArgumentNullException(nameof(blogPostToTagRows));
+        if (blogPostRow is null)
+        {
+            throw new ArgumentNullException(nameof(blogPostRow));
+        }
+
+        if (blogPostToTagRows is null)
+        {
+            throw new ArgumentNullException(nameof(blogPostToTagRows));
+        }
 
         var tags = blogPostToTagRows
             .Select(t => Guid.Parse(t.TagId))

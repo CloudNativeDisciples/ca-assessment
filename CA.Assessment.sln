@@ -8,8 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA.Assessment.Tests", "CA.A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA.Assessment.Domain.Anemic", "CA.Assessment.Domain.Anemic\CA.Assessment.Domain.Anemic.csproj", "{CD2D0157-90F3-4126-BD17-9E8342F4FB76}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA.Assessment.Infrastructure", "CA.Assessment.Infrastructure\CA.Assessment.Infrastructure.csproj", "{69B1594F-34AB-4286-888D-6C7E6436853E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA.Assessment.Database", "CA.Assessment.Database\CA.Assessment.Database.csproj", "{7929D02E-4458-449B-B30A-B32B9594E875}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA.Assessment.Database.Migrations", "CA.Assessment.Database.Migrations\CA.Assessment.Database.Migrations.csproj", "{E63D017B-C0C5-4C4F-A884-235CD02A734C}"
@@ -17,6 +15,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA.Assessment.Images", "CA.Assessment.Images\CA.Assessment.Images.csproj", "{FFDD679A-B61E-49ED-9D04-5DFBE5A395C9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{E2AAE4CD-14D3-4846-B7F5-55C00D89A920}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA.Assessment.Database.Sqlite", "CA.Assessment.Database.Sqlite\CA.Assessment.Database.Sqlite.csproj", "{8EF47F47-4453-42E6-9652-16B8834D0535}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,10 +40,6 @@ Global
 		{CD2D0157-90F3-4126-BD17-9E8342F4FB76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD2D0157-90F3-4126-BD17-9E8342F4FB76}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD2D0157-90F3-4126-BD17-9E8342F4FB76}.Release|Any CPU.Build.0 = Release|Any CPU
-		{69B1594F-34AB-4286-888D-6C7E6436853E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{69B1594F-34AB-4286-888D-6C7E6436853E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{69B1594F-34AB-4286-888D-6C7E6436853E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{69B1594F-34AB-4286-888D-6C7E6436853E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7929D02E-4458-449B-B30A-B32B9594E875}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7929D02E-4458-449B-B30A-B32B9594E875}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7929D02E-4458-449B-B30A-B32B9594E875}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -56,10 +52,15 @@ Global
 		{FFDD679A-B61E-49ED-9D04-5DFBE5A395C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFDD679A-B61E-49ED-9D04-5DFBE5A395C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFDD679A-B61E-49ED-9D04-5DFBE5A395C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EF47F47-4453-42E6-9652-16B8834D0535}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EF47F47-4453-42E6-9652-16B8834D0535}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EF47F47-4453-42E6-9652-16B8834D0535}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EF47F47-4453-42E6-9652-16B8834D0535}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{FFDD679A-B61E-49ED-9D04-5DFBE5A395C9} = {E2AAE4CD-14D3-4846-B7F5-55C00D89A920}
 		{7929D02E-4458-449B-B30A-B32B9594E875} = {E2AAE4CD-14D3-4846-B7F5-55C00D89A920}
 		{E63D017B-C0C5-4C4F-A884-235CD02A734C} = {E2AAE4CD-14D3-4846-B7F5-55C00D89A920}
+		{8EF47F47-4453-42E6-9652-16B8834D0535} = {E2AAE4CD-14D3-4846-B7F5-55C00D89A920}
 	EndGlobalSection
 EndGlobal

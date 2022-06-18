@@ -1,4 +1,4 @@
-namespace CA.Assessment.Infrastructure.Rows;
+namespace CA.Assessment.Database.Sqlite.Rows;
 
 public sealed class BlogPostSummaryRow
 {

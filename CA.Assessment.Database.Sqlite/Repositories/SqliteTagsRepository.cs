@@ -1,34 +1,41 @@
 using CA.Assessment.Application.Repositories;
+using CA.Assessment.Database.Sqlite.Mappers;
+using CA.Assessment.Database.Sqlite.Rows;
 using CA.Assessment.Domain.Anemic;
-using CA.Assessment.Infrastructure.Mappers;
-using CA.Assessment.Infrastructure.Rows;
 using CA.Assessment.Store;
 using Dapper;
 
-namespace CA.Assessment.Infrastructure.Repositories;
+namespace CA.Assessment.Database.Sqlite.Repositories;
 
-internal sealed class SQLiteTagsRepository : ITagsRepository
+internal sealed class SqliteTagsRepository : ITagsRepository
 {
-    private readonly IDatabaseSession databaseSession;
-    private readonly TagRowsMapper tagRowsMapper;
+    private readonly IDatabaseSession _databaseSession;
+    private readonly TagRowsMapper _tagRowsMapper;
 
-    public SQLiteTagsRepository(IDatabaseSession databaseSession, TagRowsMapper tagRowsMapper)
+    public SqliteTagsRepository(IDatabaseSession databaseSession, TagRowsMapper tagRowsMapper)
     {
-        this.databaseSession = databaseSession ?? throw new ArgumentNullException(nameof(databaseSession));
-        this.tagRowsMapper = tagRowsMapper ?? throw new ArgumentNullException(nameof(tagRowsMapper));
+        _databaseSession = databaseSession ?? throw new ArgumentNullException(nameof(databaseSession));
+        _tagRowsMapper = tagRowsMapper ?? throw new ArgumentNullException(nameof(tagRowsMapper));
     }
 
     public async Task SaveAsync(Tag tagToSave)
     {
-        if (tagToSave is null) throw new ArgumentNullException(nameof(tagToSave));
+        if (tagToSave is null)
+        {
+            throw new ArgumentNullException(nameof(tagToSave));
+        }
 
-        if (databaseSession.Connection is null)
+        if (_databaseSession.Connection is null)
+        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
+        }
 
-        if (databaseSession.Transaction is null)
+        if (_databaseSession.Transaction is null)
+        {
             throw new InvalidOperationException(
                 "No transaction in the database session. You must start a transaction before calling repository methods");
+        }
 
         var query = @"
             INSERT INTO tags(id, name)
@@ -41,16 +48,18 @@ internal sealed class SQLiteTagsRepository : ITagsRepository
             tagToSave.Name
         };
 
-        await databaseSession.Connection.ExecuteAsync(query,
+        await _databaseSession.Connection.ExecuteAsync(query,
             queryParams,
-            databaseSession.Transaction);
+            _databaseSession.Transaction);
     }
 
     public async Task<IEnumerable<Tag>> GetTagsByNameAsync(IEnumerable<string> tagNames)
     {
-        if (databaseSession.Connection is null)
+        if (_databaseSession.Connection is null)
+        {
             throw new InvalidOperationException(
                 "You must open a connection in the current database session before calling repository methods");
+        }
 
         var query = @"
             SELECT id, name
@@ -63,18 +72,20 @@ internal sealed class SQLiteTagsRepository : ITagsRepository
             TagNames = tagNames
         };
 
-        var tagRows = await databaseSession.Connection.QueryAsync<TagRow>(query,
+        var tagRows = await _databaseSession.Connection.QueryAsync<TagRow>(query,
             queryParams,
-            databaseSession.Transaction);
+            _databaseSession.Transaction);
 
-        return tagRowsMapper.MapMany(tagRows);
+        return _tagRowsMapper.MapMany(tagRows);
     }
 
     public async Task<IEnumerable<Tag>> GetManyAsync(IEnumerable<Guid> tagIds)
     {
-        if (databaseSession.Connection is null)
+        if (_databaseSession.Connection is null)
+        {
             throw new InvalidOperationException(
                 "You must open a connection in the current database session before calling repository methods");
+        }
 
         var query = @"
             SELECT id, name
@@ -87,24 +98,31 @@ internal sealed class SQLiteTagsRepository : ITagsRepository
             TagIds = tagIds.Select(t => t.ToString()).ToList()
         };
 
-        var tagRows = await databaseSession.Connection.QueryAsync<TagRow>(query,
+        var tagRows = await _databaseSession.Connection.QueryAsync<TagRow>(query,
             queryParams,
-            databaseSession.Transaction);
+            _databaseSession.Transaction);
 
-        return tagRowsMapper.MapMany(tagRows);
+        return _tagRowsMapper.MapMany(tagRows);
     }
 
     public async Task AddTagsToBlogPostAsync(Guid blogPostId, IEnumerable<Tag> tagsToAdd)
     {
-        if (tagsToAdd is null) throw new ArgumentNullException(nameof(tagsToAdd));
+        if (tagsToAdd is null)
+        {
+            throw new ArgumentNullException(nameof(tagsToAdd));
+        }
 
-        if (databaseSession.Connection is null)
+        if (_databaseSession.Connection is null)
+        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
+        }
 
-        if (databaseSession.Transaction is null)
+        if (_databaseSession.Transaction is null)
+        {
             throw new InvalidOperationException(
                 "No transaction in the database session. You must start a transaction before calling repository methods");
+        }
 
         var query = @"
             INSERT INTO blog_posts_to_tags(blog_post_id, tag_id)
@@ -115,22 +133,29 @@ internal sealed class SQLiteTagsRepository : ITagsRepository
             tagsToAdd.Select(t => new { TagId = t.Identity.ToString(), BlogPostId = blogPostId.ToString() })
                 .ToList();
 
-        await databaseSession.Connection.ExecuteAsync(query,
+        await _databaseSession.Connection.ExecuteAsync(query,
             queryParams,
-            databaseSession.Transaction);
+            _databaseSession.Transaction);
     }
 
     public async Task RemoveTagsToBlogPostAsync(Guid blogPostId, IEnumerable<Tag> tagsToRemove)
     {
-        if (tagsToRemove is null) throw new ArgumentNullException(nameof(tagsToRemove));
+        if (tagsToRemove is null)
+        {
+            throw new ArgumentNullException(nameof(tagsToRemove));
+        }
 
-        if (databaseSession.Connection is null)
+        if (_databaseSession.Connection is null)
+        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
+        }
 
-        if (databaseSession.Transaction is null)
+        if (_databaseSession.Transaction is null)
+        {
             throw new InvalidOperationException(
                 "No transaction in the database session. You must start a transaction before calling repository methods");
+        }
 
         var query = @"
             DELETE FROM blog_posts_to_tags
@@ -141,8 +166,8 @@ internal sealed class SQLiteTagsRepository : ITagsRepository
             tagsToRemove.Select(t => new { TagId = t.Identity.ToString(), BlogPostId = blogPostId.ToString() })
                 .ToList();
 
-        await databaseSession.Connection.ExecuteAsync(query,
+        await _databaseSession.Connection.ExecuteAsync(query,
             queryParams,
-            databaseSession.Transaction);
+            _databaseSession.Transaction);
     }
 }

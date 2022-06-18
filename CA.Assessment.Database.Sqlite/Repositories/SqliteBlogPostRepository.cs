@@ -1,41 +1,47 @@
 using CA.Assessment.Application.Dtos;
 using CA.Assessment.Application.Repositories;
+using CA.Assessment.Database.Sqlite.Mappers;
+using CA.Assessment.Database.Sqlite.Rows;
 using CA.Assessment.Domain.Anemic;
-using CA.Assessment.Infrastructure.Mappers;
-using CA.Assessment.Infrastructure.Rows;
 using CA.Assessment.Store;
 using Dapper;
 
-namespace CA.Assessment.Infrastructure.Repositories;
+namespace CA.Assessment.Database.Sqlite.Repositories;
 
-internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
+internal sealed class SqliteBlogPostRepository : IBlogPostRepository
 {
-    private readonly BlogPostRowsMapper blogPostRowsMapper;
-    private readonly BlogPostSummaryRowMapper blogPostSummaryRowMapper;
-    private readonly IDatabaseSession databaseSession;
+    private readonly BlogPostRowsMapper _blogPostRowsMapper;
+    private readonly BlogPostSummaryRowMapper _blogPostSummaryRowMapper;
+    private readonly IDatabaseSession _databaseSession;
 
-    public SQLiteBlogPostRepository(
+    public SqliteBlogPostRepository(
         IDatabaseSession databaseSession,
         BlogPostRowsMapper blogPostRowsMapper,
         BlogPostSummaryRowMapper blogPostSummaryRowMapper)
     {
-        this.databaseSession = databaseSession ?? throw new ArgumentNullException(nameof(databaseSession));
-        this.blogPostRowsMapper = blogPostRowsMapper ?? throw new ArgumentNullException(nameof(blogPostRowsMapper));
-        this.blogPostSummaryRowMapper = blogPostSummaryRowMapper ??
-                                        throw new ArgumentNullException(nameof(blogPostSummaryRowMapper));
+        _databaseSession = databaseSession ?? throw new ArgumentNullException(nameof(databaseSession));
+        _blogPostRowsMapper = blogPostRowsMapper ?? throw new ArgumentNullException(nameof(blogPostRowsMapper));
+        _blogPostSummaryRowMapper = blogPostSummaryRowMapper ?? throw new ArgumentNullException(nameof(blogPostSummaryRowMapper));
     }
 
     public async Task SaveAsync(BlogPost blogPost)
     {
-        if (blogPost is null) throw new ArgumentNullException(nameof(blogPost));
+        if (blogPost is null)
+        {
+            throw new ArgumentNullException(nameof(blogPost));
+        }
 
-        if (databaseSession.Connection is null)
+        if (_databaseSession.Connection is null)
+        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
+        }
 
-        if (databaseSession.Transaction is null)
+        if (_databaseSession.Transaction is null)
+        {
             throw new InvalidOperationException(
                 "No transaction in the database session. You must start a transaction before calling repository methods");
+        }
 
         var insertBlogPostQuery = @"
             INSERT INTO blog_posts(id, author, title, content, image_id, category_id)
@@ -52,18 +58,20 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
             CategoryId = blogPost.Category.ToString()
         };
 
-        await databaseSession.Connection.ExecuteAsync(insertBlogPostQuery,
+        await _databaseSession.Connection.ExecuteAsync(insertBlogPostQuery,
             insertBlogPostParams,
-            databaseSession.Transaction);
+            _databaseSession.Transaction);
 
         await SaveTagsToBlogPostAsync(blogPost);
     }
 
     public async Task<BlogPost?> GetAsync(Guid blogPostIdentity)
     {
-        if (databaseSession.Connection is null)
+        if (_databaseSession.Connection is null)
+        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
+        }
 
         var blogPostQuery = @"
             SELECT id, author, content, title, image_id AS ImageId, category_id AS CategoryId
@@ -76,11 +84,14 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
             BlogPostId = blogPostIdentity.ToString()
         };
 
-        var blogPostRow = await databaseSession.Connection.QueryFirstOrDefaultAsync<BlogPostRow>(blogPostQuery,
+        var blogPostRow = await _databaseSession.Connection.QueryFirstOrDefaultAsync<BlogPostRow>(blogPostQuery,
             blogPostQueryParams,
-            databaseSession.Transaction);
+            _databaseSession.Transaction);
 
-        if (blogPostRow is null) return null;
+        if (blogPostRow is null)
+        {
+            return null;
+        }
 
         var blogPostTagsQuery = @"
             SELECT blog_post_id AS BlogPostId, tag_id AS TagId
@@ -93,22 +104,26 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
             BlogPostId = blogPostIdentity.ToString()
         };
 
-        var blogPostTagRows = databaseSession.Connection.Query<BlogPostToTagRow>(blogPostTagsQuery,
+        var blogPostTagRows = _databaseSession.Connection.Query<BlogPostToTagRow>(blogPostTagsQuery,
             blogPostTagsQueryParams,
-            databaseSession.Transaction);
+            _databaseSession.Transaction);
 
-        return blogPostRowsMapper.MapOne(blogPostRow, blogPostTagRows);
+        return _blogPostRowsMapper.MapOne(blogPostRow, blogPostTagRows);
     }
 
     public async Task DeleteAsync(Guid blogPostIdentity)
     {
-        if (databaseSession.Connection is null)
+        if (_databaseSession.Connection is null)
+        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
+        }
 
-        if (databaseSession.Transaction is null)
+        if (_databaseSession.Transaction is null)
+        {
             throw new InvalidOperationException(
                 "No transaction in the database session. You must start a transaction before calling repository methods");
+        }
 
         var deleteBlogPostQuery = @"
             DELETE FROM blog_posts
@@ -130,26 +145,33 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
             BlogPostId = blogPostIdentity.ToString()
         };
 
-        await databaseSession.Connection.ExecuteAsync(deleteBlogPostsToTagsQuery,
+        await _databaseSession.Connection.ExecuteAsync(deleteBlogPostsToTagsQuery,
             deleteBlogPostsToTagsQueryParams,
-            databaseSession.Transaction);
+            _databaseSession.Transaction);
 
-        await databaseSession.Connection.ExecuteAsync(deleteBlogPostQuery,
+        await _databaseSession.Connection.ExecuteAsync(deleteBlogPostQuery,
             deleteBlogPostQueryParams,
-            databaseSession.Transaction);
+            _databaseSession.Transaction);
     }
 
     public async Task UpdateAsync(BlogPost blogPost)
     {
-        if (blogPost is null) throw new ArgumentNullException(nameof(blogPost));
+        if (blogPost is null)
+        {
+            throw new ArgumentNullException(nameof(blogPost));
+        }
 
-        if (databaseSession.Connection is null)
+        if (_databaseSession.Connection is null)
+        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
+        }
 
-        if (databaseSession.Transaction is null)
+        if (_databaseSession.Transaction is null)
+        {
             throw new InvalidOperationException(
                 "No transaction in the database session. You must start a transaction before calling repository methods");
+        }
 
         //It's easier to delete all the N-to-N tuples from the table than trying to reconcile them without an ORM
         await DeleteTagsFromBlogPostAsync(blogPost);
@@ -171,9 +193,9 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
             Image = blogPost.Image.ToString()
         };
 
-        await databaseSession.Connection.ExecuteAsync(query,
+        await _databaseSession.Connection.ExecuteAsync(query,
             queryParams,
-            databaseSession.Transaction);
+            _databaseSession.Transaction);
     }
 
     public async Task<IEnumerable<BlogPostSummary>> SearchAsync(
@@ -181,9 +203,11 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
         string? filtersCategory,
         IEnumerable<string>? filtersTags)
     {
-        if (databaseSession.Connection is null)
+        if (_databaseSession.Connection is null)
+        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
+        }
 
         var searchQuery = @"
             SELECT blog_posts.id, blog_posts.title
@@ -212,24 +236,31 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
             Tags = filtersTags?.Select(t => $"%{t}%").ToList()
         };
 
-        var rows = await databaseSession.Connection.QueryAsync<BlogPostSummaryRow>(searchQuery,
+        var rows = await _databaseSession.Connection.QueryAsync<BlogPostSummaryRow>(searchQuery,
             queryParams,
-            databaseSession.Transaction);
+            _databaseSession.Transaction);
 
-        return blogPostSummaryRowMapper.MapMany(rows);
+        return _blogPostSummaryRowMapper.MapMany(rows);
     }
 
     private async Task DeleteTagsFromBlogPostAsync(BlogPost blogPost)
     {
-        if (blogPost is null) throw new ArgumentNullException(nameof(blogPost));
+        if (blogPost is null)
+        {
+            throw new ArgumentNullException(nameof(blogPost));
+        }
 
-        if (databaseSession.Connection is null)
+        if (_databaseSession.Connection is null)
+        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
+        }
 
-        if (databaseSession.Transaction is null)
+        if (_databaseSession.Transaction is null)
+        {
             throw new InvalidOperationException(
                 "No transaction in the database session. You must start a transaction before calling repository methods");
+        }
 
         var query = @"
             DELETE FROM blog_posts_to_tags
@@ -241,22 +272,29 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
             BlogPostId = blogPost.Identity.ToString()
         };
 
-        await databaseSession.Connection.ExecuteAsync(query,
+        await _databaseSession.Connection.ExecuteAsync(query,
             queryParams,
-            databaseSession.Transaction);
+            _databaseSession.Transaction);
     }
 
     private async Task SaveTagsToBlogPostAsync(BlogPost blogPost)
     {
-        if (blogPost is null) throw new ArgumentNullException(nameof(blogPost));
+        if (blogPost is null)
+        {
+            throw new ArgumentNullException(nameof(blogPost));
+        }
 
-        if (databaseSession.Connection is null)
+        if (_databaseSession.Connection is null)
+        {
             throw new InvalidOperationException(
                 "No connection in the database session. You must open a connection before calling repository methods");
+        }
 
-        if (databaseSession.Transaction is null)
+        if (_databaseSession.Transaction is null)
+        {
             throw new InvalidOperationException(
                 "No transaction in the database session. You must start a transaction before calling repository methods");
+        }
 
         var insertTagsQuery = @"
             INSERT INTO blog_posts_to_tags(blog_post_id, tag_id)
@@ -267,8 +305,8 @@ internal sealed class SQLiteBlogPostRepository : IBlogPostRepository
             .Select(t => new { BlogPostId = blogPost.Identity.ToString(), TagId = t.ToString() })
             .ToList();
 
-        await databaseSession.Connection.ExecuteAsync(insertTagsQuery,
+        await _databaseSession.Connection.ExecuteAsync(insertTagsQuery,
             insertTagsParams,
-            databaseSession.Transaction);
+            _databaseSession.Transaction);
     }
 }

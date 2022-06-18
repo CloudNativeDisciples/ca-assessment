@@ -1,12 +1,12 @@
 using System.Globalization;
 using CA.Assessment.Application.Repositories;
+using CA.Assessment.Database.Sqlite.Mappers;
+using CA.Assessment.Database.Sqlite.Rows;
 using CA.Assessment.Domain.Anemic;
-using CA.Assessment.Infrastructure.Mappers;
-using CA.Assessment.Infrastructure.Rows;
 using CA.Assessment.Store;
 using Dapper;
 
-namespace CA.Assessment.Infrastructure.Repositories;
+namespace CA.Assessment.Database.Sqlite.Repositories;
 
 internal sealed class SqliteImagesRepository : IImagesRepository
 {
@@ -21,7 +21,10 @@ internal sealed class SqliteImagesRepository : IImagesRepository
 
     public async Task SaveAsync(Image image)
     {
-        if (image is null) throw new ArgumentNullException(nameof(image));
+        if (image is null)
+        {
+            throw new ArgumentNullException(nameof(image));
+        }
 
         if (_databaseSession.Connection is null)
         {
