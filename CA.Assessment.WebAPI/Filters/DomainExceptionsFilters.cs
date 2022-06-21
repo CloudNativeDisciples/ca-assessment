@@ -1,5 +1,5 @@
 using System.Net;
-using CA.Assessment.Domain.Anemic.Exceptions;
+using CA.Assessment.Model.Exceptions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -10,6 +10,11 @@ public sealed class DomainExceptionFilters : IExceptionFilter
 {
     public void OnException(ExceptionContext context)
     {
+        if (context is null)
+        {
+            throw new ArgumentNullException(nameof(context));
+        }
+
         var maybeResult = context.Exception switch
         {
             BlogPostImageNotFoundException => new NotFoundResult(),
@@ -28,15 +33,18 @@ public sealed class DomainExceptionFilters : IExceptionFilter
         context.Result = maybeResult;
     }
 
-    private IActionResult GenerateValidationResult(ValidationException validationEx)
+    private static IActionResult GenerateValidationResult(ValidationException validationEx)
     {
-        if (validationEx is null) throw new ArgumentNullException(nameof(validationEx));
+        if (validationEx is null)
+        {
+            throw new ArgumentNullException(nameof(validationEx));
+        }
 
         var errorCodes = validationEx.Errors
             .Select(v => new { Code = v.ErrorCode, Property = v.PropertyName })
             .ToList();
 
-        var jsonResult = new JsonResult(errorCodes) { StatusCode = (int) HttpStatusCode.BadRequest };
+        var jsonResult = new JsonResult(errorCodes) { StatusCode = (int)HttpStatusCode.BadRequest };
 
         return jsonResult;
     }

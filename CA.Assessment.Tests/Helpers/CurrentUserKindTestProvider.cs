@@ -1,6 +1,5 @@
-using System.Threading.Tasks;
-using CA.Assessment.Application.Providers;
-using CA.Assessment.Domain.Anemic;
+using CA.Assessment.Application.Services;
+using CA.Assessment.Model;
 
 namespace CA.Assessment.Tests.Helpers;
 

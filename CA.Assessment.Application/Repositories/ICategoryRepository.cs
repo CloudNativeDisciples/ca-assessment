@@ -1,4 +1,4 @@
-using CA.Assessment.Domain.Anemic;
+using CA.Assessment.Model;
 
 namespace CA.Assessment.Application.Repositories;
 

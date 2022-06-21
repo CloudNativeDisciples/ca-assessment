@@ -9,8 +9,15 @@ public static class ServiceCollectionExtensions
         this IServiceCollection serviceCollection,
         string connectionString)
     {
-        if (serviceCollection is null) throw new ArgumentNullException(nameof(serviceCollection));
-        if (connectionString is null) throw new ArgumentNullException(nameof(connectionString));
+        if (serviceCollection is null)
+        {
+            throw new ArgumentNullException(nameof(serviceCollection));
+        }
+
+        if (connectionString is null)
+        {
+            throw new ArgumentNullException(nameof(connectionString));
+        }
 
         serviceCollection.AddFluentMigratorCore()
             .ConfigureRunner(runner => runner.AddSQLite()

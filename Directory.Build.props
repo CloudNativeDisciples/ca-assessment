@@ -1,10 +1,10 @@
 <Project>
-    <PropertyGroup>
-        <AnalysisLevel>latest-All</AnalysisLevel>
-        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <LangVersion>10.0</LangVersion>
-        <TargetFramework>net6</TargetFramework>
-    </PropertyGroup>
+  <PropertyGroup>
+    <AnalysisLevel>latest-All</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>10.0</LangVersion>
+    <TargetFramework>net6</TargetFramework>
+  </PropertyGroup>
 </Project>

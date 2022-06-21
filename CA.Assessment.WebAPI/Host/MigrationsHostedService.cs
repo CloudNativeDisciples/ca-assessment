@@ -4,18 +4,18 @@ namespace CA.Assessment.WebAPI.Host;
 
 internal sealed class MigrationsHostedService : IHostedService
 {
-    private readonly IServiceProvider serviceProvider;
+    private readonly IServiceProvider _serviceProvider;
 
     public MigrationsHostedService(IServiceProvider serviceProvider)
     {
-        this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        using var serviceScope = serviceProvider.CreateScope();
+        using var serviceScope = _serviceProvider.CreateScope();
 
         var migrator = serviceScope.ServiceProvider.GetRequiredService<IMigrationRunner>();
 

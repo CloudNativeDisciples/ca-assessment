@@ -1,21 +1,21 @@
 using CA.Assessment.Database.Sqlite.Rows;
-using CA.Assessment.Domain.Anemic;
+using CA.Assessment.Model;
 
 namespace CA.Assessment.Database.Sqlite.Mappers;
 
-internal sealed class TagRowsMapper
+internal static class TagRowsMapper
 {
-    private Tag MapOne(TagRow tagRow)
+    private static Tag MapOne(TagDbRow tagDbRow)
     {
-        if (tagRow is null)
+        if (tagDbRow is null)
         {
-            throw new ArgumentNullException(nameof(tagRow));
+            throw new ArgumentNullException(nameof(tagDbRow));
         }
 
-        return new Tag(Guid.Parse(tagRow.Id), tagRow.Name);
+        return new Tag(Guid.Parse(tagDbRow.Id), tagDbRow.Name);
     }
 
-    internal IEnumerable<Tag> MapMany(IEnumerable<TagRow> tagRows)
+    internal static IEnumerable<Tag> MapMany(IEnumerable<TagDbRow> tagRows)
     {
         if (tagRows is null)
         {

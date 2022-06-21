@@ -5,11 +5,11 @@ namespace CA.Assessment.Store;
 
 public sealed class DatabaseSessionManager : IDatabaseSessionManager, IDatabaseSession, IDisposable
 {
-    private readonly IDatabaseConnectionFactory connectionFactory;
+    private readonly IDatabaseConnectionFactory _connectionFactory;
 
     public DatabaseSessionManager(IDatabaseConnectionFactory connectionFactory)
     {
-        this.connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+        _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
     }
 
     public DbConnection? Connection { get; private set; }
@@ -18,9 +18,15 @@ public sealed class DatabaseSessionManager : IDatabaseSessionManager, IDatabaseS
 
     public async Task BeginTransactionAsync()
     {
-        if (Connection is null) await OpenConnectionAsync();
+        if (Connection is null)
+        {
+            await OpenConnectionAsync();
+        }
 
-        if (Transaction is not null) await RollbackTransactionAsync();
+        if (Transaction is not null)
+        {
+            await RollbackTransactionAsync();
+        }
 
         var newTransaction = await Connection!.BeginTransactionAsync();
 
@@ -29,9 +35,15 @@ public sealed class DatabaseSessionManager : IDatabaseSessionManager, IDatabaseS
 
     public async Task CommitTransactionAsync()
     {
-        if (Connection is null) return;
+        if (Connection is null)
+        {
+            return;
+        }
 
-        if (Transaction is null) return;
+        if (Transaction is null)
+        {
+            return;
+        }
 
         await Transaction.CommitAsync();
         await Transaction.DisposeAsync();
@@ -41,9 +53,15 @@ public sealed class DatabaseSessionManager : IDatabaseSessionManager, IDatabaseS
 
     public async Task RollbackTransactionAsync()
     {
-        if (Connection is null) return;
+        if (Connection is null)
+        {
+            return;
+        }
 
-        if (Transaction is null) return;
+        if (Transaction is null)
+        {
+            return;
+        }
 
         await Transaction.RollbackAsync();
         await Transaction.DisposeAsync();
@@ -53,11 +71,17 @@ public sealed class DatabaseSessionManager : IDatabaseSessionManager, IDatabaseS
 
     public async Task OpenConnectionAsync()
     {
-        if (Transaction is not null) await RollbackTransactionAsync();
+        if (Transaction is not null)
+        {
+            await RollbackTransactionAsync();
+        }
 
-        if (Connection is not null) await CloseConnectionAsync();
+        if (Connection is not null)
+        {
+            await CloseConnectionAsync();
+        }
 
-        var newConnection = connectionFactory.GetNewConnection();
+        var newConnection = _connectionFactory.GetNewConnection();
 
         await newConnection.OpenAsync();
 
@@ -66,9 +90,15 @@ public sealed class DatabaseSessionManager : IDatabaseSessionManager, IDatabaseS
 
     public async Task CloseConnectionAsync()
     {
-        if (Connection is null) return;
+        if (Connection is null)
+        {
+            return;
+        }
 
-        if (Transaction is not null) await RollbackTransactionAsync();
+        if (Transaction is not null)
+        {
+            await RollbackTransactionAsync();
+        }
 
         await Connection.CloseAsync();
         await Connection.DisposeAsync();

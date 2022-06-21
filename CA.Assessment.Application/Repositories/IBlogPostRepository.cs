@@ -1,5 +1,5 @@
-using CA.Assessment.Application.Dtos;
-using CA.Assessment.Domain.Anemic;
+using CA.Assessment.Application.Responses;
+using CA.Assessment.Model;
 
 namespace CA.Assessment.Application.Repositories;
 
@@ -13,8 +13,5 @@ public interface IBlogPostRepository
 
     Task UpdateAsync(BlogPost blogPost);
 
-    Task<IEnumerable<BlogPostSummary>> SearchAsync(
-        string? filtersTitle,
-        string? filtersCategory,
-        IEnumerable<string>? filtersTags);
+    Task<IEnumerable<BlogPostSummary>> SearchAsync(string? filtersTitle, string? filtersCategory, IEnumerable<string>? filtersTags);
 }

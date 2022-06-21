@@ -1,13 +1,10 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using CA.Assessment.Application.Dtos;
-using CA.Assessment.Application.Services;
-using CA.Assessment.Domain.Anemic;
-using CA.Assessment.Domain.Anemic.Exceptions;
+using CA.Assessment.Application.Requests;
+using CA.Assessment.Application.Scripts;
+using CA.Assessment.Model;
+using CA.Assessment.Model.Exceptions;
 using CA.Assessment.Tests.Helpers;
 using NUnit.Framework;
+using static CA.Assessment.Tests.Helpers.StreamHelpers;
 
 namespace CA.Assessment.Tests;
 
@@ -16,15 +13,17 @@ public class BlogPostTest : IntegrationTest
     [Test]
     public async Task Blog_posts_can_be_saved()
     {
-        var sut = Resolve<IBlogPostsService>();
+        var newBlogPostTxScript = Resolve<NewBlogPostTxScript>();
 
         var newBlogPostId = Guid.NewGuid();
 
         var newBlogPostRequest = new NewBlogPost("title", "content", "author", "category", new[] { "tag_1", "tag_2" });
 
-        await sut.NewAsync(newBlogPostId, newBlogPostRequest);
+        await newBlogPostTxScript.ExecuteAsync(newBlogPostId, newBlogPostRequest);
 
-        var newBlogPost = await sut.GetAsync(newBlogPostId);
+        var getBlogPostTxScript = Resolve<GetBlogPostTxScript>();
+
+        var newBlogPost = await getBlogPostTxScript.ExecuteAsync(newBlogPostId);
 
         Assert.That(newBlogPost, Is.Not.Null);
 
@@ -37,23 +36,27 @@ public class BlogPostTest : IntegrationTest
     [Test]
     public async Task Blog_posts_can_be_deleted_if_user_is_admin()
     {
-        var sut = Resolve<IBlogPostsService>();
+        var newBlogPostTxScript = Resolve<NewBlogPostTxScript>();
 
         var newBlogPostId = Guid.NewGuid();
 
         var newBlogPostRequest = new NewBlogPost("title", "content", "author", "category", new[] { "tag_1", "tag_2" });
 
-        await sut.NewAsync(newBlogPostId, newBlogPostRequest);
+        await newBlogPostTxScript.ExecuteAsync(newBlogPostId, newBlogPostRequest);
 
-        var newBlogPost = await sut.GetAsync(newBlogPostId);
+        var getBlogPostTxScript = Resolve<GetBlogPostTxScript>();
+
+        var newBlogPost = await getBlogPostTxScript.ExecuteAsync(newBlogPostId);
 
         Assert.That(newBlogPost, Is.Not.Null);
 
         SetCurrentUserKind(UserKind.Admin);
 
-        await sut.DeleteAsync(newBlogPostId);
+        var deleteBlogPostTxScript = Resolve<DeleteBlogPostTxScript>();
 
-        var maybeBlogPost = await sut.GetAsync(newBlogPostId);
+        await deleteBlogPostTxScript.ExecuteAsync(newBlogPostId);
+
+        var maybeBlogPost = await getBlogPostTxScript.ExecuteAsync(newBlogPostId);
 
         Assert.That(maybeBlogPost, Is.Null);
     }
@@ -61,28 +64,32 @@ public class BlogPostTest : IntegrationTest
     [Test]
     public async Task Blog_posts_cant_be_deleted_if_user_is_not_admin()
     {
-        var sut = Resolve<IBlogPostsService>();
+        var newBlogPostTxScript = Resolve<NewBlogPostTxScript>();
 
         var newBlogPostId = Guid.NewGuid();
 
         var newBlogPostRequest = new NewBlogPost("title", "content", "author", "category", new[] { "tag_1", "tag_2" });
 
-        await sut.NewAsync(newBlogPostId, newBlogPostRequest);
+        await newBlogPostTxScript.ExecuteAsync(newBlogPostId, newBlogPostRequest);
 
-        var newBlogPost = await sut.GetAsync(newBlogPostId);
+        var getBlogPostTxScript = Resolve<GetBlogPostTxScript>();
+
+        var newBlogPost = await getBlogPostTxScript.ExecuteAsync(newBlogPostId);
 
         Assert.That(newBlogPost, Is.Not.Null);
 
         SetCurrentUserKind(UserKind.User);
 
+        var deleteBlogPostTxScript = Resolve<DeleteBlogPostTxScript>();
+
         async Task TryDeleteAsync()
         {
-            await sut.DeleteAsync(newBlogPostId);
+            await deleteBlogPostTxScript.ExecuteAsync(newBlogPostId);
         }
 
         Assert.That(TryDeleteAsync, Throws.InstanceOf<ForbiddenBlogPostDeletionException>());
 
-        var maybeBlogPost = await sut.GetAsync(newBlogPostId);
+        var maybeBlogPost = await getBlogPostTxScript.ExecuteAsync(newBlogPostId);
 
         Assert.That(maybeBlogPost, Is.Not.Null);
     }
@@ -90,23 +97,23 @@ public class BlogPostTest : IntegrationTest
     [Test]
     public async Task Blog_post_can_be_partially_updated()
     {
-        var sut = Resolve<IBlogPostsService>();
+        var newBlogPostTxScript = Resolve<NewBlogPostTxScript>();
 
         var newBlogPostId = Guid.NewGuid();
 
         var newBlogPostRequest = new NewBlogPost("title", "content", "author", "category", new[] { "tag_1", "tag_2" });
 
-        await sut.NewAsync(newBlogPostId, newBlogPostRequest);
+        await newBlogPostTxScript.ExecuteAsync(newBlogPostId, newBlogPostRequest);
 
-        var newBlogPost = await sut.GetAsync(newBlogPostId);
-
-        Assert.That(newBlogPost, Is.Not.Null);
+        var updateBlogPostTxScript = Resolve<UpdateBlogPostTxScript>();
 
         var updateBlogPost = new UpdateBlogPost("new title", null, "new author", null, null);
 
-        await sut.UpdateAsync(newBlogPostId, updateBlogPost);
+        await updateBlogPostTxScript.ExecuteAsync(newBlogPostId, updateBlogPost);
 
-        var blogPost = await sut.GetAsync(newBlogPostId);
+        var getBlogPostTxScript = Resolve<GetBlogPostTxScript>();
+
+        var blogPost = await getBlogPostTxScript.ExecuteAsync(newBlogPostId);
 
         Assert.That(blogPost, Is.Not.Null);
 
@@ -117,31 +124,31 @@ public class BlogPostTest : IntegrationTest
     [Test]
     public async Task Blog_posts_can_be_searched()
     {
-        var sut = Resolve<ISearchService>();
-
-        var blogPostsService = Resolve<IBlogPostsService>();
+        var newBlogPostTxScript = Resolve<NewBlogPostTxScript>();
 
         var newBlogPostId = Guid.NewGuid();
 
         var newBlogPostRequest = new NewBlogPost("title_1", "content", "author", "category_2", new[] { "tag_3" });
 
-        await blogPostsService.NewAsync(newBlogPostId, newBlogPostRequest);
+        await newBlogPostTxScript.ExecuteAsync(newBlogPostId, newBlogPostRequest);
 
         var anotherBlogPostId = Guid.NewGuid();
 
         var anotherBlogPost = new NewBlogPost("title_2", "content", "author", "category_1", new[] { "tag_2" });
 
-        await blogPostsService.NewAsync(anotherBlogPostId, anotherBlogPost);
+        await newBlogPostTxScript.ExecuteAsync(anotherBlogPostId, anotherBlogPost);
 
         var moreBlogPostId = Guid.NewGuid();
 
         var moreBlogPosts = new NewBlogPost("title_3", "content", "author", "category_2", new[] { "tag_2" });
 
-        await blogPostsService.NewAsync(moreBlogPostId, moreBlogPosts);
+        await newBlogPostTxScript.ExecuteAsync(moreBlogPostId, moreBlogPosts);
 
-        var search = new SearchBlogPostsFilters(null, new[] { "tag_3" }, null);
+        var searchBlogPostsTxScript = Resolve<SearchBlogPostsTxScript>();
 
-        var blogPostsFound = await sut.SearchBlogPostsAsync(search);
+        var filters = new SearchBlogPostsFilters(null, new[] { "tag_3" }, null);
+
+        var blogPostsFound = await searchBlogPostsTxScript.ExecuteAsync(filters);
 
         var blogPostsList = blogPostsFound.ToList();
 
@@ -152,19 +159,21 @@ public class BlogPostTest : IntegrationTest
     [Test]
     public async Task Blog_posts_can_be_tagged()
     {
-        var sut = Resolve<ITagsService>();
-
-        var blogPostsService = Resolve<IBlogPostsService>();
+        var newBlogPostTxScript = Resolve<NewBlogPostTxScript>();
 
         var newBlogPostId = Guid.NewGuid();
 
         var newBlogPostRequest = new NewBlogPost("title_1", "content", "author", "category_2", new[] { "tag_3" });
 
-        await blogPostsService.NewAsync(newBlogPostId, newBlogPostRequest);
+        await newBlogPostTxScript.ExecuteAsync(newBlogPostId, newBlogPostRequest);
 
-        await sut.TagAsync(newBlogPostId, new[] { "tag_1", "tag_2" });
+        var tagBlogPostTxScript = Resolve<TagBlogPostTxScript>();
 
-        var blogPost = await blogPostsService.GetAsync(newBlogPostId);
+        await tagBlogPostTxScript.ExecuteAsync(newBlogPostId, new[] { "tag_1", "tag_2" });
+
+        var getBlogPostTxScript = Resolve<GetBlogPostTxScript>();
+
+        var blogPost = await getBlogPostTxScript.ExecuteAsync(newBlogPostId);
 
         var tagNames = blogPost!.Tags.Select(t => t.Name).ToList();
 
@@ -175,20 +184,22 @@ public class BlogPostTest : IntegrationTest
     [Test]
     public async Task Blog_posts_can_be_untagged()
     {
-        var sut = Resolve<ITagsService>();
-
-        var blogPostsService = Resolve<IBlogPostsService>();
+        var newBlogPostTxScript = Resolve<NewBlogPostTxScript>();
 
         var newBlogPostId = Guid.NewGuid();
 
         var newBlogPostRequest = new NewBlogPost("title_1", "content", "author", "category_2",
             new[] { "tag_1", "tag_2", "tag_3" });
 
-        await blogPostsService.NewAsync(newBlogPostId, newBlogPostRequest);
+        await newBlogPostTxScript.ExecuteAsync(newBlogPostId, newBlogPostRequest);
 
-        await sut.UntagAsync(newBlogPostId, new[] { "tag_1", "tag_2" });
+        var untagBlogPostTxScript = Resolve<UntagBlogPostTxScript>();
 
-        var blogPost = await blogPostsService.GetAsync(newBlogPostId);
+        await untagBlogPostTxScript.ExecuteAsync(newBlogPostId, new[] { "tag_1", "tag_2" });
+
+        var getBlogPostTxScript = Resolve<GetBlogPostTxScript>();
+
+        var blogPost = await getBlogPostTxScript.ExecuteAsync(newBlogPostId);
 
         var tagNames = blogPost!.Tags.Select(t => t.Name).ToList();
 
@@ -199,9 +210,7 @@ public class BlogPostTest : IntegrationTest
     [Test]
     public async Task Blog_posts_can_have_an_image()
     {
-        var sut = Resolve<IImageService>();
-
-        var blogPostsService = Resolve<IBlogPostsService>();
+        var newBlogPostTxScript = Resolve<NewBlogPostTxScript>();
 
         var newBlogPostId = Guid.NewGuid();
 
@@ -210,34 +219,33 @@ public class BlogPostTest : IntegrationTest
         var newBlogPostRequest = new NewBlogPost("title_1", "content", "author", "category_2",
             new[] { "tag_1", "tag_2", "tag_3" });
 
-        await blogPostsService.NewAsync(newBlogPostId, newBlogPostRequest);
+        await newBlogPostTxScript.ExecuteAsync(newBlogPostId, newBlogPostRequest);
 
-        using var inMemoryStream = new MemoryStream();
+        var inMemoryStream = await NewBytesStreamAsync(new byte[] { 15, 14, 13, 14 });
 
-        await inMemoryStream.WriteAsync(new byte[] { 15, 14, 13, 14 });
-        await inMemoryStream.FlushAsync();
+        var newBlogPostImage = new BlogPostImageToAttach("test", "image/png", inMemoryStream);
 
-        inMemoryStream.Seek(0L, SeekOrigin.Begin);
+        var attachImageTxScript = Resolve<AttachBlogPostImageTxScript>();
 
-        var newBlogPostImage = new NewBlogPostImage("test", "image/png", inMemoryStream);
+        await attachImageTxScript.ExecuteAsync(newImageId, newBlogPostId, newBlogPostImage);
 
-        await sut.AttachImageToBlogPostAsync(newImageId, newBlogPostId, newBlogPostImage);
+        var getBlogPostTxScript = Resolve<GetBlogPostTxScript>();
 
-        var blogPost = await blogPostsService.GetAsync(newBlogPostId);
+        var blogPost = await getBlogPostTxScript.ExecuteAsync(newBlogPostId);
 
-        var image = await sut.GetBlogPostImageAsync(newBlogPostId, newImageId);
+        var getBlogPostImageTxScript = Resolve<GetBlogPostImageDataTxScript>();
+
+        var image = await getBlogPostImageTxScript.ExecuteAsync(newBlogPostId);
 
         Assert.That(blogPost!.Image, Is.EqualTo(newImageId));
 
         Assert.That(image, Is.Not.Null);
-        Assert.That(image.ImageStream, Is.Not.Null);
+        Assert.That(image!.ImageStream, Is.Not.Null);
         Assert.That(image.Mime, Is.EqualTo("image/png"));
 
-        var buffer = new byte[4];
+        var buffer = await ReadBytesFromStreamAsync(image.ImageStream, 4);
 
-        var bytesRead = await image.ImageStream.ReadAsync(buffer, 0, 4);
-
-        Assert.That(bytesRead, Is.EqualTo(4));
+        Assert.That(buffer, Has.Length.EqualTo(4));
         Assert.That(buffer, Is.EqualTo(new byte[] { 15, 14, 13, 14 }));
     }
 }

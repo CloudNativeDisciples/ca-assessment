@@ -1,8 +1,7 @@
-using CA.Assessment.Application.Dtos;
-using CA.Assessment.Application.Mappers;
-using CA.Assessment.Application.Providers;
+using CA.Assessment.Application.Requests;
+using CA.Assessment.Application.Scripts;
 using CA.Assessment.Application.Services;
-using CA.Assessment.Application.Validations;
+using CA.Assessment.Application.Validators;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,21 +11,29 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddAssessmentApplication(this IServiceCollection serviceCollection)
     {
-        if (serviceCollection is null) throw new ArgumentNullException(nameof(serviceCollection));
+        if (serviceCollection is null)
+        {
+            throw new ArgumentNullException(nameof(serviceCollection));
+        }
 
-        serviceCollection.AddTransient<ICategoriesMaker, CategoriesMaker>();
-        serviceCollection.AddTransient<ITagsMaker, TagsMaker>();
+        serviceCollection.AddTransient<CategoriesMaker>();
+        serviceCollection.AddTransient<TagsMaker>();
 
-        serviceCollection.AddTransient<IBlogPostsService, BlogPostService>();
-        serviceCollection.AddTransient<ISearchService, SearchService>();
-        serviceCollection.AddTransient<ITagsService, TagsService>();
-        serviceCollection.AddTransient<IImageService, ImageService>();
+        serviceCollection.AddTransient<NewBlogPostTxScript>();
+        serviceCollection.AddTransient<GetBlogPostTxScript>();
+        serviceCollection.AddTransient<UpdateBlogPostTxScript>();
+        serviceCollection.AddTransient<DeleteBlogPostTxScript>();
+
+        serviceCollection.AddTransient<AttachBlogPostImageTxScript>();
+        serviceCollection.AddTransient<GetBlogPostImageDataTxScript>();
+
+        serviceCollection.AddTransient<SearchBlogPostsTxScript>();
+
+        serviceCollection.AddTransient<TagBlogPostTxScript>();
+        serviceCollection.AddTransient<UntagBlogPostTxScript>();
 
         serviceCollection.AddTransient<IValidator<NewBlogPost>, NewBlogPostValidator>();
         serviceCollection.AddTransient<IValidator<UpdateBlogPost>, UpdateBlogPostValidator>();
-
-        serviceCollection.AddTransient<BlogPostMapper>();
-        serviceCollection.AddTransient<ImageMapper>();
 
         return serviceCollection;
     }

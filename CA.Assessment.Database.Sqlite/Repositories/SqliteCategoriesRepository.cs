@@ -1,7 +1,7 @@
 using CA.Assessment.Application.Repositories;
 using CA.Assessment.Database.Sqlite.Mappers;
 using CA.Assessment.Database.Sqlite.Rows;
-using CA.Assessment.Domain.Anemic;
+using CA.Assessment.Model;
 using CA.Assessment.Store;
 using Dapper;
 
@@ -9,13 +9,11 @@ namespace CA.Assessment.Database.Sqlite.Repositories;
 
 internal sealed class SqliteCategoriesRepository : ICategoryRepository
 {
-    private readonly CategoryRowsMapper _categoryRowsMapper;
     private readonly IDatabaseSession _databaseSession;
 
-    public SqliteCategoriesRepository(IDatabaseSession databaseSession, CategoryRowsMapper categoryRowsMapper)
+    public SqliteCategoriesRepository(IDatabaseSession databaseSession)
     {
         _databaseSession = databaseSession ?? throw new ArgumentNullException(nameof(databaseSession));
-        _categoryRowsMapper = categoryRowsMapper ?? throw new ArgumentNullException(nameof(categoryRowsMapper));
     }
 
     public async Task<Category?> GetByNameAsync(string categoryName)
@@ -42,7 +40,7 @@ internal sealed class SqliteCategoriesRepository : ICategoryRepository
             Name = categoryName
         };
 
-        var categoryRow = await _databaseSession.Connection.QuerySingleOrDefaultAsync<CategoryRow>(query,
+        var categoryRow = await _databaseSession.Connection.QuerySingleOrDefaultAsync<CategoryDbRow>(query,
             queryParams,
             _databaseSession.Transaction);
 
@@ -51,7 +49,7 @@ internal sealed class SqliteCategoriesRepository : ICategoryRepository
             return null;
         }
 
-        return _categoryRowsMapper.MapOne(categoryRow);
+        return CategoryRowsMapper.MapOne(categoryRow);
     }
 
     public async Task SaveAsync(Category category)
@@ -108,7 +106,7 @@ internal sealed class SqliteCategoriesRepository : ICategoryRepository
             CategoryId = categoryId.ToString()
         };
 
-        var maybeCategory = await _databaseSession.Connection.QueryFirstOrDefaultAsync<CategoryRow>(query,
+        var maybeCategory = await _databaseSession.Connection.QueryFirstOrDefaultAsync<CategoryDbRow>(query,
             queryParams,
             _databaseSession.Transaction);
 
@@ -117,6 +115,6 @@ internal sealed class SqliteCategoriesRepository : ICategoryRepository
             return null;
         }
 
-        return _categoryRowsMapper.MapOne(maybeCategory);
+        return CategoryRowsMapper.MapOne(maybeCategory);
     }
 }

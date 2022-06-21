@@ -9,7 +9,8 @@
     <ItemGroup>
         <ProjectReference Include="..\CA.Assessment.Application\CA.Assessment.Application.csproj"/>
         <ProjectReference Include="..\CA.Assessment.Database.Migrations\CA.Assessment.Database.Migrations.csproj"/>
-        <ProjectReference Include="..\CA.Assessment.Infrastructure\CA.Assessment.Infrastructure.csproj"/>
+        <ProjectReference Include="..\CA.Assessment.Database.Sqlite\CA.Assessment.Database.Sqlite.csproj"/>
+        <ProjectReference Include="..\CA.Assessment.Images\CA.Assessment.Images.csproj"/>
     </ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@ using System.Globalization;
 using CA.Assessment.Application.Repositories;
 using CA.Assessment.Database.Sqlite.Mappers;
 using CA.Assessment.Database.Sqlite.Rows;
-using CA.Assessment.Domain.Anemic;
+using CA.Assessment.Model;
 using CA.Assessment.Store;
 using Dapper;
 
@@ -11,15 +11,13 @@ namespace CA.Assessment.Database.Sqlite.Repositories;
 internal sealed class SqliteImagesRepository : IImagesRepository
 {
     private readonly IDatabaseSession _databaseSession;
-    private readonly ImageRowsMapper _imageRowsMapper;
 
-    public SqliteImagesRepository(IDatabaseSession databaseSession, ImageRowsMapper imageRowsMapper)
+    public SqliteImagesRepository(IDatabaseSession databaseSession)
     {
         _databaseSession = databaseSession ?? throw new ArgumentNullException(nameof(databaseSession));
-        _imageRowsMapper = imageRowsMapper ?? throw new ArgumentNullException(nameof(imageRowsMapper));
     }
 
-    public async Task SaveAsync(Image image)
+    public async Task SaveAsync(BlogPostImage image)
     {
         if (image is null)
         {
@@ -57,7 +55,7 @@ internal sealed class SqliteImagesRepository : IImagesRepository
             _databaseSession.Transaction);
     }
 
-    public async Task<Image?> GetAsync(Guid imageId)
+    public async Task<BlogPostImage?> GetAsync(Guid imageId)
     {
         if (_databaseSession.Connection is null)
         {
@@ -78,7 +76,7 @@ internal sealed class SqliteImagesRepository : IImagesRepository
             ImageId = strImageId
         };
 
-        var imageRow = await _databaseSession.Connection.QueryFirstOrDefaultAsync<ImageRow>(query,
+        var imageRow = await _databaseSession.Connection.QueryFirstOrDefaultAsync<ImageDbRow>(query,
             queryParams,
             _databaseSession.Transaction);
 
@@ -87,6 +85,6 @@ internal sealed class SqliteImagesRepository : IImagesRepository
             return null;
         }
 
-        return await _imageRowsMapper.MapOneAsync(imageRow);
+        return await ImageRowsMapper.MapOneAsync(imageRow);
     }
 }

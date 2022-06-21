@@ -1,8 +1,8 @@
-using CA.Assessment.Application.Dtos;
 using CA.Assessment.Application.Repositories;
+using CA.Assessment.Application.Responses;
 using CA.Assessment.Database.Sqlite.Mappers;
 using CA.Assessment.Database.Sqlite.Rows;
-using CA.Assessment.Domain.Anemic;
+using CA.Assessment.Model;
 using CA.Assessment.Store;
 using Dapper;
 
@@ -10,18 +10,11 @@ namespace CA.Assessment.Database.Sqlite.Repositories;
 
 internal sealed class SqliteBlogPostRepository : IBlogPostRepository
 {
-    private readonly BlogPostRowsMapper _blogPostRowsMapper;
-    private readonly BlogPostSummaryRowMapper _blogPostSummaryRowMapper;
     private readonly IDatabaseSession _databaseSession;
 
-    public SqliteBlogPostRepository(
-        IDatabaseSession databaseSession,
-        BlogPostRowsMapper blogPostRowsMapper,
-        BlogPostSummaryRowMapper blogPostSummaryRowMapper)
+    public SqliteBlogPostRepository(IDatabaseSession databaseSession)
     {
         _databaseSession = databaseSession ?? throw new ArgumentNullException(nameof(databaseSession));
-        _blogPostRowsMapper = blogPostRowsMapper ?? throw new ArgumentNullException(nameof(blogPostRowsMapper));
-        _blogPostSummaryRowMapper = blogPostSummaryRowMapper ?? throw new ArgumentNullException(nameof(blogPostSummaryRowMapper));
     }
 
     public async Task SaveAsync(BlogPost blogPost)
@@ -84,7 +77,7 @@ internal sealed class SqliteBlogPostRepository : IBlogPostRepository
             BlogPostId = blogPostIdentity.ToString()
         };
 
-        var blogPostRow = await _databaseSession.Connection.QueryFirstOrDefaultAsync<BlogPostRow>(blogPostQuery,
+        var blogPostRow = await _databaseSession.Connection.QueryFirstOrDefaultAsync<BlogPostDbRow>(blogPostQuery,
             blogPostQueryParams,
             _databaseSession.Transaction);
 
@@ -104,11 +97,11 @@ internal sealed class SqliteBlogPostRepository : IBlogPostRepository
             BlogPostId = blogPostIdentity.ToString()
         };
 
-        var blogPostTagRows = _databaseSession.Connection.Query<BlogPostToTagRow>(blogPostTagsQuery,
+        var blogPostTagRows = _databaseSession.Connection.Query<BlogPostToTagDbRow>(blogPostTagsQuery,
             blogPostTagsQueryParams,
             _databaseSession.Transaction);
 
-        return _blogPostRowsMapper.MapOne(blogPostRow, blogPostTagRows);
+        return BlogPostRowsMapper.MapOne(blogPostRow, blogPostTagRows);
     }
 
     public async Task DeleteAsync(Guid blogPostIdentity)
@@ -233,14 +226,14 @@ internal sealed class SqliteBlogPostRepository : IBlogPostRepository
         {
             Title = filtersTitle is not null ? $"%{filtersTitle}%" : null,
             Category = filtersCategory is not null ? $"%{filtersCategory}%" : null,
-            Tags = filtersTags?.Select(t => $"%{t}%").ToList()
+            Tags = filtersTags?.Select(tags => $"%{tags}%").ToList()
         };
 
-        var rows = await _databaseSession.Connection.QueryAsync<BlogPostSummaryRow>(searchQuery,
+        var blogPostRows = await _databaseSession.Connection.QueryAsync<BlogPostSummaryDbRow>(searchQuery,
             queryParams,
             _databaseSession.Transaction);
 
-        return _blogPostSummaryRowMapper.MapMany(rows);
+        return BlogPostSummaryRowMapper.MapMany(blogPostRows);
     }
 
     private async Task DeleteTagsFromBlogPostAsync(BlogPost blogPost)

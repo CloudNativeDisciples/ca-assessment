@@ -1,7 +1,7 @@
 using CA.Assessment.Application.Repositories;
 using CA.Assessment.Database.Sqlite.Mappers;
 using CA.Assessment.Database.Sqlite.Rows;
-using CA.Assessment.Domain.Anemic;
+using CA.Assessment.Model;
 using CA.Assessment.Store;
 using Dapper;
 
@@ -10,12 +10,10 @@ namespace CA.Assessment.Database.Sqlite.Repositories;
 internal sealed class SqliteTagsRepository : ITagsRepository
 {
     private readonly IDatabaseSession _databaseSession;
-    private readonly TagRowsMapper _tagRowsMapper;
 
-    public SqliteTagsRepository(IDatabaseSession databaseSession, TagRowsMapper tagRowsMapper)
+    public SqliteTagsRepository(IDatabaseSession databaseSession)
     {
         _databaseSession = databaseSession ?? throw new ArgumentNullException(nameof(databaseSession));
-        _tagRowsMapper = tagRowsMapper ?? throw new ArgumentNullException(nameof(tagRowsMapper));
     }
 
     public async Task SaveAsync(Tag tagToSave)
@@ -72,11 +70,11 @@ internal sealed class SqliteTagsRepository : ITagsRepository
             TagNames = tagNames
         };
 
-        var tagRows = await _databaseSession.Connection.QueryAsync<TagRow>(query,
+        var tagRows = await _databaseSession.Connection.QueryAsync<TagDbRow>(query,
             queryParams,
             _databaseSession.Transaction);
 
-        return _tagRowsMapper.MapMany(tagRows);
+        return TagRowsMapper.MapMany(tagRows);
     }
 
     public async Task<IEnumerable<Tag>> GetManyAsync(IEnumerable<Guid> tagIds)
@@ -98,11 +96,11 @@ internal sealed class SqliteTagsRepository : ITagsRepository
             TagIds = tagIds.Select(t => t.ToString()).ToList()
         };
 
-        var tagRows = await _databaseSession.Connection.QueryAsync<TagRow>(query,
+        var tagRows = await _databaseSession.Connection.QueryAsync<TagDbRow>(query,
             queryParams,
             _databaseSession.Transaction);
 
-        return _tagRowsMapper.MapMany(tagRows);
+        return TagRowsMapper.MapMany(tagRows);
     }
 
     public async Task AddTagsToBlogPostAsync(Guid blogPostId, IEnumerable<Tag> tagsToAdd)
@@ -138,7 +136,7 @@ internal sealed class SqliteTagsRepository : ITagsRepository
             _databaseSession.Transaction);
     }
 
-    public async Task RemoveTagsToBlogPostAsync(Guid blogPostId, IEnumerable<Tag> tagsToRemove)
+    public async Task RemoveTagsFromBlogPostAsync(Guid blogPostId, IEnumerable<Tag> tagsToRemove)
     {
         if (tagsToRemove is null)
         {

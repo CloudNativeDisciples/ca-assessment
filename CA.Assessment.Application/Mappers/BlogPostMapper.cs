@@ -1,38 +1,33 @@
-using CA.Assessment.Application.Dtos;
-using CA.Assessment.Application.Repositories;
-using CA.Assessment.Domain.Anemic;
-using CA.Assessment.Domain.Anemic.Exceptions;
+using CA.Assessment.Application.Responses;
+using CA.Assessment.Model;
 
 namespace CA.Assessment.Application.Mappers;
 
-internal sealed class BlogPostMapper
+internal static class BlogPostMapper
 {
-    private readonly ICategoryRepository categoryRepository;
-    private readonly ITagsRepository tagsRepository;
-
-    public BlogPostMapper(ITagsRepository tagsRepository, ICategoryRepository categoryRepository)
+    internal static BlogPostDetails MapOneToBlogPostDetails(BlogPost blogPost, Category category, IEnumerable<Tag> tags)
     {
-        this.tagsRepository = tagsRepository ?? throw new ArgumentNullException(nameof(tagsRepository));
-        this.categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
-    }
+        if (blogPost is null)
+        {
+            throw new ArgumentNullException(nameof(blogPost));
+        }
 
-    public async Task<BlogPostDetail> MapOneToBlogPostDetailsAsync(BlogPost blogPost)
-    {
-        if (blogPost is null) throw new ArgumentNullException(nameof(blogPost));
+        if (category is null)
+        {
+            throw new ArgumentNullException(nameof(category));
+        }
 
-        var blogPostCategory = await categoryRepository.GetAsync(blogPost.Category);
+        if (tags is null)
+        {
+            throw new ArgumentNullException(nameof(tags));
+        }
 
-        if (blogPostCategory is null) throw new MissingCategoryException(blogPost.Category);
-
-        var tags = await tagsRepository.GetManyAsync(blogPost.Tags);
-
-        var tagDetails = tags
-            .Select(t => new TagDetails(t.Identity, t.Name))
+        var tagDetails = tags.Select(t => new TagDetails(t.Identity, t.Name))
             .ToList();
 
-        var categoryDetails = new CategoryDetails(blogPostCategory.Identity, blogPostCategory.Name);
+        var categoryDetails = new CategoryDetails(category.Identity, category.Name);
 
-        return new BlogPostDetail(blogPost.Identity, blogPost.Author, blogPost.Content, blogPost.Title,
+        return new BlogPostDetails(blogPost.Identity, blogPost.Author, blogPost.Content, blogPost.Title,
             blogPost.Image, categoryDetails, tagDetails);
     }
 }

@@ -1,10 +1,10 @@
-﻿namespace CA.Assessment.Images.Stores.FileSystem;
+﻿using CA.Assessment.Application.Services;
 
-public sealed class ImageFromFileSystemStore : IImageFromStore
+namespace CA.Assessment.Images.Stores.FileSystem;
+
+internal sealed class ImageFromFileSystemStore : IImageContent
 {
     private readonly string _imageFullPath;
-
-    public Guid Ref { get; }
 
     public ImageFromFileSystemStore(Guid imageRef, string imageFullPath)
     {
@@ -13,9 +13,10 @@ public sealed class ImageFromFileSystemStore : IImageFromStore
         Ref = imageRef;
     }
 
+    public Guid Ref { get; }
+
     public Stream OpenReadStream()
     {
-        return new FileStream(_imageFullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096,
-            FileOptions.Asynchronous);
+        return new FileStream(_imageFullPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
     }
 }

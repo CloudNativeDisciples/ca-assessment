@@ -1,19 +1,19 @@
-using CA.Assessment.Application.Dtos;
-using CA.Assessment.Domain.Anemic;
-using CA.Assessment.Images;
+using CA.Assessment.Application.Responses;
+using CA.Assessment.Application.Services;
+using CA.Assessment.Model;
 
 namespace CA.Assessment.Application.Mappers;
 
-internal sealed class ImageMapper
+internal static class ImageMapper
 {
-    internal BlogPostImageData MapOneToBlogPostImageData(Image blogPostImage, IImageFromStore imageStream)
+    internal static BlogPostImageData MapOneToBlogPostImageData(BlogPostImage blogPostImage, IImageContent imageStream)
     {
         if (blogPostImage is null)
         {
             throw new ArgumentNullException(nameof(blogPostImage));
         }
 
-        if (imageStream == null)
+        if (imageStream is null)
         {
             throw new ArgumentNullException(nameof(imageStream));
         }

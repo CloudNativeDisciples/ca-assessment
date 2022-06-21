@@ -1,4 +1,4 @@
-using CA.Assessment.Domain.Anemic;
+using CA.Assessment.Model;
 
 namespace CA.Assessment.Application.Repositories;
 
@@ -12,5 +12,5 @@ public interface ITagsRepository
 
     Task AddTagsToBlogPostAsync(Guid blogPostId, IEnumerable<Tag> tagsToAdd);
 
-    Task RemoveTagsToBlogPostAsync(Guid blogPostId, IEnumerable<Tag> tagsToRemove);
+    Task RemoveTagsFromBlogPostAsync(Guid blogPostId, IEnumerable<Tag> tagsToRemove);
 }

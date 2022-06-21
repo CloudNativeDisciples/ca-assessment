@@ -1,7 +1,8 @@
 using CA.Assessment.Application.Extensions;
-using CA.Assessment.Application.Providers;
+using CA.Assessment.Application.Services;
 using CA.Assessment.Database.Migrations.Extensions;
-using CA.Assessment.Infrastructure.Extensions;
+using CA.Assessment.Database.Sqlite.Extensions;
+using CA.Assessment.Images.Extensions;
 using CA.Assessment.Store.Extensions;
 using CA.Assessment.WebAPI.Host;
 using CA.Assessment.WebAPI.Services;
@@ -28,7 +29,8 @@ builder.Services.AddTransient<ICurrentUserKindProvider, CurrentHttpContextUserKi
 builder.Services.AddAssessmentDatabase(databaseConnectionStringValue)
     .AddAssessmentMigrations(databaseConnectionStringValue)
     .AddAssessmentApplication()
-    .AddAssessmentInfrastructure();
+    .AddAssessmentSqliteDatabase()
+    .AddAssessmentFileSystemImageStore(imageStoreOptions);
 
 builder.Services.AddControllers();
 

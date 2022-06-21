@@ -1,17 +1,17 @@
 using CA.Assessment.Database.Sqlite.Rows;
-using CA.Assessment.Domain.Anemic;
+using CA.Assessment.Model;
 
 namespace CA.Assessment.Database.Sqlite.Mappers;
 
-internal class CategoryRowsMapper
+internal static class CategoryRowsMapper
 {
-    internal Category MapOne(CategoryRow categoryRow)
+    internal static Category MapOne(CategoryDbRow categoryDbRow)
     {
-        if (categoryRow is null)
+        if (categoryDbRow is null)
         {
-            throw new ArgumentNullException(nameof(categoryRow));
+            throw new ArgumentNullException(nameof(categoryDbRow));
         }
 
-        return new Category(Guid.Parse(categoryRow.Id), categoryRow.Name);
+        return new Category(Guid.Parse(categoryDbRow.Id), categoryDbRow.Name);
     }
 }

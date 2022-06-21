@@ -1,6 +1,6 @@
-using CA.Assessment.Application.Dtos;
-using CA.Assessment.Application.Services;
+using CA.Assessment.Application.Requests;
 using CA.Assessment.WebAPI.Filters;
+using CA.Assessment.WebAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CA.Assessment.WebAPI.Controllers;
@@ -10,31 +10,24 @@ namespace CA.Assessment.WebAPI.Controllers;
 [TypeFilter(typeof(DomainExceptionFilters))]
 public class BlogPostsController : ControllerBase
 {
-    private readonly IBlogPostsService blogPostsService;
-    private readonly IImageService imageService;
-    private readonly ISearchService searchService;
-    private readonly ITagsService tagsService;
+    private readonly TxScriptsFacade _txScriptsFacade;
 
-    public BlogPostsController(
-        IBlogPostsService blogPostsService,
-        ISearchService searchService,
-        ITagsService tagsService,
-        IImageService imageService)
+    public BlogPostsController(TxScriptsFacade txScriptsFacade)
     {
-        this.blogPostsService = blogPostsService ?? throw new ArgumentNullException(nameof(blogPostsService));
-        this.searchService = searchService ?? throw new ArgumentNullException(nameof(searchService));
-        this.tagsService = tagsService ?? throw new ArgumentNullException(nameof(tagsService));
-        this.imageService = imageService ?? throw new ArgumentNullException(nameof(imageService));
+        _txScriptsFacade = txScriptsFacade ?? throw new ArgumentNullException(nameof(txScriptsFacade));
     }
 
     [HttpPost]
     public async Task<IActionResult> NewBlogPostAsync([FromBody] NewBlogPost? newBlogPost)
     {
-        if (newBlogPost is null) return BadRequest();
+        if (newBlogPost is null)
+        {
+            return BadRequest();
+        }
 
         var newBlogPostId = Guid.NewGuid();
 
-        await blogPostsService.NewAsync(newBlogPostId, newBlogPost);
+        await _txScriptsFacade.NewBlogPostAsync(newBlogPostId, newBlogPost);
 
         return Ok(newBlogPostId);
     }
@@ -42,9 +35,12 @@ public class BlogPostsController : ControllerBase
     [HttpGet("{blogPostId}")]
     public async Task<IActionResult> GetBlogPostAsync([FromRoute] Guid blogPostId)
     {
-        var maybeBlogPost = await blogPostsService.GetAsync(blogPostId);
+        var maybeBlogPost = await _txScriptsFacade.GetBlogPostAsync(blogPostId);
 
-        if (maybeBlogPost is null) return NotFound();
+        if (maybeBlogPost is null)
+        {
+            return NotFound();
+        }
 
         return Ok(maybeBlogPost);
     }
@@ -52,19 +48,20 @@ public class BlogPostsController : ControllerBase
     [HttpDelete("{blogPostId}")]
     public async Task<IActionResult> DeleteBlogPostAsync([FromRoute] Guid blogPostId)
     {
-        await blogPostsService.DeleteAsync(blogPostId);
+        await _txScriptsFacade.DeleteBlogPostAsync(blogPostId);
 
         return NoContent();
     }
 
     [HttpPatch("{blogPostId}")]
-    public async Task<IActionResult> UpdateBlogPostAsync(
-        [FromRoute] Guid blogPostId,
-        [FromBody] UpdateBlogPost? updateBlogPost)
+    public async Task<IActionResult> UpdateBlogPostAsync([FromRoute] Guid blogPostId, [FromBody] UpdateBlogPost? updateBlogPost)
     {
-        if (updateBlogPost is null) return BadRequest();
+        if (updateBlogPost is null)
+        {
+            return BadRequest();
+        }
 
-        await blogPostsService.UpdateAsync(blogPostId, updateBlogPost);
+        await _txScriptsFacade.UpdateBlogPostAsync(blogPostId, updateBlogPost);
 
         return NoContent();
     }
@@ -72,9 +69,12 @@ public class BlogPostsController : ControllerBase
     [HttpPost("search")]
     public async Task<IActionResult> SearchBlogPostsAsync([FromBody] SearchBlogPostsFilters? searchBlogPostsFilters)
     {
-        if (searchBlogPostsFilters is null) return BadRequest();
+        if (searchBlogPostsFilters is null)
+        {
+            return BadRequest();
+        }
 
-        var searchResults = await searchService.SearchBlogPostsAsync(searchBlogPostsFilters);
+        var searchResults = await _txScriptsFacade.SearchBlogPostsAsync(searchBlogPostsFilters);
 
         return Ok(searchResults);
     }
@@ -82,9 +82,12 @@ public class BlogPostsController : ControllerBase
     [HttpDelete("{blogPostId}/tags")]
     public async Task<IActionResult> RemoveTagsAsync([FromRoute] Guid blogPostId, [FromBody] IEnumerable<string>? tags)
     {
-        if (tags is null) return BadRequest();
+        if (tags is null)
+        {
+            return BadRequest();
+        }
 
-        await tagsService.UntagAsync(blogPostId, tags);
+        await _txScriptsFacade.UntagBlogPostAsync(blogPostId, tags);
 
         return NoContent();
     }
@@ -92,33 +95,44 @@ public class BlogPostsController : ControllerBase
     [HttpPut("{blogPostId}/tags")]
     public async Task<IActionResult> AddTagsAsync([FromRoute] Guid blogPostId, [FromBody] IEnumerable<string>? tags)
     {
-        if (tags is null) return BadRequest();
+        if (tags is null)
+        {
+            return BadRequest();
+        }
 
-        await tagsService.TagAsync(blogPostId, tags);
+        await _txScriptsFacade.TagBlogPostAsync(blogPostId, tags);
 
         return NoContent();
     }
 
-    [HttpPost("{blogPostId}/images")]
+    [HttpPost("{blogPostId}/image")]
     public async Task<IActionResult> UploadImageAsync([FromRoute] Guid blogPostId, [FromForm] IFormFile? image)
     {
-        if (image is null) return BadRequest();
+        if (image is null)
+        {
+            return BadRequest();
+        }
 
         var newImageId = Guid.NewGuid();
 
         await using var imageStream = image.OpenReadStream();
 
-        var newBlogPostImage = new NewBlogPostImage(image.Name, image.ContentType, imageStream);
+        var newBlogPostImage = new BlogPostImageToAttach(image.Name, image.ContentType, imageStream);
 
-        await imageService.AttachImageToBlogPostAsync(newImageId, blogPostId, newBlogPostImage);
+        await _txScriptsFacade.AttachImageToBlogPostAsync(newImageId, blogPostId, newBlogPostImage);
 
         return Ok(newImageId);
     }
 
-    [HttpGet("{blogPostId}/images/{imageId}")]
-    public async Task<IActionResult> GetImageAsync([FromRoute] Guid blogPostId, [FromRoute] Guid imageId)
+    [HttpGet("{blogPostId}/image")]
+    public async Task<IActionResult> GetImageAsync([FromRoute] Guid blogPostId)
     {
-        var image = await imageService.GetBlogPostImageAsync(blogPostId, imageId);
+        var image = await _txScriptsFacade.GetBlogPostImageDataAsync(blogPostId);
+
+        if (image is null)
+        {
+            return NotFound();
+        }
 
         return File(image.ImageStream, image.Mime);
     }

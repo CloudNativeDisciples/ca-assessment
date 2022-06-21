@@ -1,26 +1,26 @@
-using System;
-using System.IO;
 using CA.Assessment.Application.Extensions;
-using CA.Assessment.Application.Providers;
+using CA.Assessment.Application.Services;
 using CA.Assessment.Database.Migrations.Extensions;
-using CA.Assessment.Domain.Anemic;
+using CA.Assessment.Database.Sqlite.Extensions;
 using CA.Assessment.Images.Extensions;
-using CA.Assessment.Infrastructure.Extensions;
+using CA.Assessment.Model;
 using CA.Assessment.Store.Extensions;
 using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using NUnit.Framework;
+using Serilog;
 
 namespace CA.Assessment.Tests.Helpers;
 
 public abstract class IntegrationTest
 {
     private string? _currentDatabaseName;
-    private string? _imageStoreFolder;
-
-    private CurrentUserKindTestProvider? _currentUserKindProvider;
 
     private IServiceScope? _currentServiceProviderScope;
+
+    private CurrentUserKindTestProvider? _currentUserKindProvider;
+    private string? _imageStoreFolder;
     private ServiceProvider? _serviceProvider;
 
     [SetUp]
@@ -36,12 +36,15 @@ public abstract class IntegrationTest
         serviceCollection.AddAssessmentMigrations(databaseConnectionString)
             .AddAssessmentDatabase(databaseConnectionString)
             .AddAssessmentApplication()
-            .AddAssessmentInfrastructure()
-            .AddFileSystemImageStore(opts => opts.Folder = _imageStoreFolder);
+            .AddAssessmentSqliteDatabase()
+            .AddAssessmentFileSystemImageStore(opts => opts.Folder = _imageStoreFolder);
 
         _currentUserKindProvider = new CurrentUserKindTestProvider();
 
+        var loggerMock = new Mock<ILogger>();
+
         serviceCollection.AddSingleton<ICurrentUserKindProvider>(_currentUserKindProvider);
+        serviceCollection.AddSingleton(loggerMock.Object);
 
         _serviceProvider = serviceCollection.BuildServiceProvider();
 
@@ -73,7 +76,7 @@ public abstract class IntegrationTest
                 Directory.Delete(_imageStoreFolder, true);
             }
         }
-        catch
+        catch (IOException)
         {
             // It's not a problem if we can't delete the database file or image store
         }

@@ -1,20 +1,20 @@
 using CA.Assessment.Database.Sqlite.Rows;
-using CA.Assessment.Domain.Anemic;
+using CA.Assessment.Model;
 
 namespace CA.Assessment.Database.Sqlite.Mappers;
 
-internal sealed class ImageRowsMapper
+internal static class ImageRowsMapper
 {
-    public Task<Image> MapOneAsync(ImageRow imageRow)
+    public static Task<BlogPostImage> MapOneAsync(ImageDbRow imageDbRow)
     {
-        if (imageRow is null)
+        if (imageDbRow is null)
         {
-            throw new ArgumentNullException(nameof(imageRow));
+            throw new ArgumentNullException(nameof(imageDbRow));
         }
 
-        var imageIdentity = Guid.Parse(imageRow.Id);
+        var imageIdentity = Guid.Parse(imageDbRow.Id);
 
-        var image = new Image(imageIdentity, imageRow.Mime, imageRow.Name);
+        var image = new BlogPostImage(imageIdentity, imageDbRow.Mime, imageDbRow.Name);
 
         return Task.FromResult(image);
     }

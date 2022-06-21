@@ -3,7 +3,7 @@ using FluentMigrator;
 namespace CA.Assessment.Database.Migrations.Scripts;
 
 [Migration(1)]
-public sealed class _01_CreateTables : Migration
+public sealed class CreateTables : Migration
 {
     public override void Up()
     {

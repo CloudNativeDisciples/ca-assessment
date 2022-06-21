@@ -4,12 +4,17 @@ namespace CA.Assessment.Store.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddAssessmentDatabase(
-        this IServiceCollection serviceCollection,
-        string connectionString)
+    public static IServiceCollection AddAssessmentDatabase(this IServiceCollection serviceCollection, string connectionString)
     {
-        if (serviceCollection is null) throw new ArgumentNullException(nameof(serviceCollection));
-        if (connectionString is null) throw new ArgumentNullException(nameof(connectionString));
+        if (serviceCollection is null)
+        {
+            throw new ArgumentNullException(nameof(serviceCollection));
+        }
+
+        if (connectionString is null)
+        {
+            throw new ArgumentNullException(nameof(connectionString));
+        }
 
         serviceCollection.AddSingleton(new DatabaseConnectionString(connectionString));
 

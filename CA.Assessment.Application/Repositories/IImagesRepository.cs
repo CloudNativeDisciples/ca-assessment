@@ -1,10 +1,10 @@
-using CA.Assessment.Domain.Anemic;
+using CA.Assessment.Model;
 
 namespace CA.Assessment.Application.Repositories;
 
 public interface IImagesRepository
 {
-    Task SaveAsync(Image image);
+    Task SaveAsync(BlogPostImage image);
 
-    Task<Image?> GetAsync(Guid imageId);
+    Task<BlogPostImage?> GetAsync(Guid imageId);
 }

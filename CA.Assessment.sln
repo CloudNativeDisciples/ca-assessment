@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA.Assessment.Application",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA.Assessment.Tests", "CA.Assessment.Tests\CA.Assessment.Tests.csproj", "{27E14EAF-C0D8-48C6-9C12-9529F5AC68C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA.Assessment.Domain.Anemic", "CA.Assessment.Domain.Anemic\CA.Assessment.Domain.Anemic.csproj", "{CD2D0157-90F3-4126-BD17-9E8342F4FB76}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA.Assessment.Model", "CA.Assessment.Model\CA.Assessment.Model.csproj", "{CD2D0157-90F3-4126-BD17-9E8342F4FB76}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CA.Assessment.Database", "CA.Assessment.Database\CA.Assessment.Database.csproj", "{7929D02E-4458-449B-B30A-B32B9594E875}"
 EndProject
