@@ -1,6 +1,6 @@
 namespace CA.Assessment.Application.Requests;
 
-public sealed class SearchBlogPostsFilters
+public sealed class SearchBlogPost
 {
     public string? Category { get; }
 
@@ -10,7 +10,7 @@ public sealed class SearchBlogPostsFilters
 
     public bool None => string.IsNullOrWhiteSpace(Title) && string.IsNullOrWhiteSpace(Category) && Tags is null;
 
-    public SearchBlogPostsFilters(string? category, IEnumerable<string>? tags, string? title)
+    public SearchBlogPost(string? category, IEnumerable<string>? tags, string? title)
     {
         Title = title;
         Category = category;

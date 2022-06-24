@@ -19,12 +19,23 @@ builder.Host.ConfigureAppConfiguration(cfg =>
     cfg.AddConfiguration(configuration);
 });
 
+builder.Host.UseDefaultServiceProvider((_, opts) =>
+{
+    opts.ValidateScopes = true;
+    opts.ValidateOnBuild = true;
+});
+
 var databaseConnectionStringValue = configuration.GetSection("Database").Get<string>();
 var imageStoreOptions = configuration.GetSection("Image_Store");
 
+builder.Services.AddSwaggerGen(opts => { opts.EnableAnnotations(); });
+
 builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddHostedService<MigrationsHostedService>();
+
 builder.Services.AddTransient<ICurrentUserKindProvider, CurrentHttpContextUserKindProvider>();
+builder.Services.AddTransient<TxScriptsFacade>();
 
 builder.Services.AddAssessmentDatabase(databaseConnectionStringValue)
     .AddAssessmentMigrations(databaseConnectionStringValue)
@@ -37,5 +48,8 @@ builder.Services.AddControllers();
 var app = builder.Build();
 
 app.MapControllers();
+app.MapSwagger();
+
+app.UseSwaggerUI();
 
 app.Run();

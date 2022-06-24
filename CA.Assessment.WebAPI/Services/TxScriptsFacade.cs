@@ -1,6 +1,7 @@
 ﻿using CA.Assessment.Application.Requests;
 using CA.Assessment.Application.Responses;
 using CA.Assessment.Application.Scripts;
+using CA.Assessment.WebAPI.Dtos;
 
 namespace CA.Assessment.WebAPI.Services;
 
@@ -45,29 +46,71 @@ public sealed class TxScriptsFacade
         return await _getBlogPostImageDataTxScript.ExecuteAsync(blogPostId);
     }
 
-    public async Task AttachImageToBlogPostAsync(Guid newImageId, Guid blogPostId, BlogPostImageToAttach newBlogPostImage)
+    public async Task<Guid> AttachImageToBlogPostAsync(Guid blogPostId, IFormFile image)
     {
-        await _attachBlogPostImageTxScript.ExecuteAsync(newImageId, blogPostId, newBlogPostImage);
+        if (image is null)
+        {
+            throw new ArgumentNullException(nameof(image));
+        }
+
+        var newImageId = Guid.NewGuid();
+
+        await using var imageStream = image.OpenReadStream();
+
+        var newBlogPostImage = new AttachImageToBlogPost(blogPostId, newImageId, image.Name, image.ContentType, imageStream);
+        
+        await _attachBlogPostImageTxScript.ExecuteAsync(newBlogPostImage);
+
+        return newImageId;
     }
 
     public async Task TagBlogPostAsync(Guid blogPostId, IEnumerable<string> tags)
     {
+        if (tags is null)
+        {
+            throw new ArgumentNullException(nameof(tags));
+        }
+
         await _tagBlogPostTxScript.ExecuteAsync(blogPostId, tags);
     }
 
     public async Task UntagBlogPostAsync(Guid blogPostId, IEnumerable<string> tags)
     {
+        if (tags is null)
+        {
+            throw new ArgumentNullException(nameof(tags));
+        }
+
         await _tagBlogPostTxScript.ExecuteAsync(blogPostId, tags);
     }
 
-    public async Task<IEnumerable<BlogPostSummary>?> SearchBlogPostsAsync(SearchBlogPostsFilters searchBlogPostsFilters)
+    public async Task<IEnumerable<BlogPostSummaryDto>> SearchBlogPostsAsync(SearchBlogPostFiltersDto filters)
     {
-        return await _searchBlogPostsTxScript.ExecuteAsync(searchBlogPostsFilters);
+        if (filters is null)
+        {
+            throw new ArgumentNullException(nameof(filters));
+        }
+
+        var searchBlogPostData = new SearchBlogPost(filters.Category, filters.Tags, filters.Title);
+
+        var searchResults = await _searchBlogPostsTxScript.ExecuteAsync(searchBlogPostData);
+
+        return searchResults
+            .Select(r => new BlogPostSummaryDto(r.Identity, r.Title))
+            .ToList();
     }
 
-    public async Task UpdateBlogPostAsync(Guid blogPostId, UpdateBlogPost updateBlogPost)
+    public async Task UpdateBlogPostAsync(Guid blogPostId, UpdateBlogPostDto updateBlogPostDto)
     {
-        await _updateBlogPostTxScript.ExecuteAsync(blogPostId, updateBlogPost);
+        if (updateBlogPostDto is null)
+        {
+            throw new ArgumentNullException(nameof(updateBlogPostDto));
+        }
+
+        var updateBlogPost = new UpdateBlogPost(blogPostId, updateBlogPostDto.Title, updateBlogPostDto.Content,
+            updateBlogPostDto.Author, updateBlogPostDto.Category, updateBlogPostDto.Tags);
+
+        await _updateBlogPostTxScript.ExecuteAsync(updateBlogPost);
     }
 
     public async Task DeleteBlogPostAsync(Guid blogPostId)
@@ -75,13 +118,38 @@ public sealed class TxScriptsFacade
         await _deleteBlogPostTxScript.ExecuteAsync(blogPostId);
     }
 
-    public async Task NewBlogPostAsync(Guid newBlogPostId, NewBlogPost newBlogPost)
+    public async Task<Guid> NewBlogPostAsync(NewBlogPostDto newBlogPostDto)
     {
-        await _newBlogPostTxScript.ExecuteAsync(newBlogPostId, newBlogPost);
+        if (newBlogPostDto is null)
+        {
+            throw new ArgumentNullException(nameof(newBlogPostDto));
+        }
+
+        var newBlogPostId = Guid.NewGuid();
+
+        var newBlogPostData = new NewBlogPost(newBlogPostId, newBlogPostDto.Title, newBlogPostDto.Content,
+            newBlogPostDto.Author, newBlogPostDto.Category, newBlogPostDto.Tags);
+
+        await _newBlogPostTxScript.ExecuteAsync(newBlogPostData);
+
+        return newBlogPostId;
     }
 
-    public async Task<BlogPostDetails?> GetBlogPostAsync(Guid blogPostId)
+    public async Task<BlogPostDetailsDto?> GetBlogPostAsync(Guid blogPostId)
     {
-        return await _getBlogPostTxScript.ExecuteAsync(blogPostId);
+        var blogPostDetails = await _getBlogPostTxScript.ExecuteAsync(blogPostId);
+
+        if (blogPostDetails is null)
+        {
+            return null;
+        }
+
+        var categoryDetailsDto = new CategoryDetailsDto(blogPostDetails.Category.Identity, blogPostDetails.Category.Name);
+
+        var tagDetailDtos = blogPostDetails.Tags
+            .Select(t => new TagDetailsDto(t.Identity, t.Name));
+
+        return new BlogPostDetailsDto(blogPostDetails.Image, blogPostDetails.Author, blogPostDetails.Content, blogPostDetails.Title,
+            blogPostDetails.Image, categoryDetailsDto, tagDetailDtos);
     }
 }

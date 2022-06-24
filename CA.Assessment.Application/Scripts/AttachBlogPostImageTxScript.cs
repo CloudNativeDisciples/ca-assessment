@@ -25,26 +25,26 @@ public sealed class AttachBlogPostImageTxScript
         _imagesContentsStore = imagesContentStore ?? throw new ArgumentNullException(nameof(imagesContentStore));
     }
 
-    public async Task ExecuteAsync(Guid newImageId, Guid blogPostId, BlogPostImageToAttach blogPostImageToAttach)
+    public async Task ExecuteAsync(AttachImageToBlogPost attachImageToBlogPost)
     {
-        if (blogPostImageToAttach is null)
+        if (attachImageToBlogPost is null)
         {
-            throw new ArgumentNullException(nameof(blogPostImageToAttach));
+            throw new ArgumentNullException(nameof(attachImageToBlogPost));
         }
 
         await _databaseSessionManager.BeginTransactionAsync();
 
-        var maybeBlogPost = await _blogPostsRepository.GetAsync(blogPostId);
+        var maybeBlogPost = await _blogPostsRepository.GetAsync(attachImageToBlogPost.BlogPostId);
 
         if (maybeBlogPost is null)
         {
-            throw new BlogPostNotFoundException(blogPostId);
+            throw new BlogPostNotFoundException(attachImageToBlogPost.BlogPostId);
         }
 
-        var newImage = new BlogPostImage(newImageId, blogPostImageToAttach.Mime, blogPostImageToAttach.Name);
+        var newImage = new BlogPostImage(attachImageToBlogPost.ImageId, attachImageToBlogPost.Mime, attachImageToBlogPost.Name);
 
         var blogPostWithImage = new BlogPost(maybeBlogPost.Identity, maybeBlogPost.Title, maybeBlogPost.Author,
-            maybeBlogPost.Content, newImageId, maybeBlogPost.Tags, maybeBlogPost.Category);
+            maybeBlogPost.Content, attachImageToBlogPost.ImageId, maybeBlogPost.Tags, maybeBlogPost.Category);
 
         try
         {
@@ -52,7 +52,7 @@ public sealed class AttachBlogPostImageTxScript
 
             await _blogPostsRepository.UpdateAsync(blogPostWithImage);
 
-            await _imagesContentsStore.SaveContentAsync(newImage.Identity, blogPostImageToAttach.ImageStream);
+            await _imagesContentsStore.SaveContentAsync(newImage.Identity, attachImageToBlogPost.ImageStream);
 
             await _databaseSessionManager.CommitTransactionAsync();
         }

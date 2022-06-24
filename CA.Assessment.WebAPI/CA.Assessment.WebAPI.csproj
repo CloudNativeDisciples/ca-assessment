@@ -7,10 +7,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CA.Assessment.Application\CA.Assessment.Application.csproj"/>
-        <ProjectReference Include="..\CA.Assessment.Database.Migrations\CA.Assessment.Database.Migrations.csproj"/>
-        <ProjectReference Include="..\CA.Assessment.Database.Sqlite\CA.Assessment.Database.Sqlite.csproj"/>
-        <ProjectReference Include="..\CA.Assessment.Images\CA.Assessment.Images.csproj"/>
+        <ProjectReference Include="..\CA.Assessment.Application\CA.Assessment.Application.csproj" />
+        <ProjectReference Include="..\CA.Assessment.Database.Migrations\CA.Assessment.Database.Migrations.csproj" />
+        <ProjectReference Include="..\CA.Assessment.Database.Sqlite\CA.Assessment.Database.Sqlite.csproj" />
+        <ProjectReference Include="..\CA.Assessment.Images\CA.Assessment.Images.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.3.1" />
     </ItemGroup>
 
 </Project>

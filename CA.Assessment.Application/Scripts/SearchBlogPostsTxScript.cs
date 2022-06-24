@@ -17,7 +17,7 @@ public sealed class SearchBlogPostsTxScript
         _blogPostRepository = blogPostRepository ?? throw new ArgumentNullException(nameof(blogPostRepository));
     }
 
-    public async Task<IEnumerable<BlogPostSummary>> ExecuteAsync(SearchBlogPostsFilters filters)
+    public async Task<IEnumerable<BlogPostSummary>> ExecuteAsync(SearchBlogPost filters)
     {
         if (filters is null)
         {

@@ -8,7 +8,7 @@
       "applicationUrl": "http://localhost:8090",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "CA_ASSESSMENT_DATABASE": "Data Source = /tmp/ca_assessment.db",
+        "CA_ASSESSMENT_DATABASE": "Data Source = .\\ca_assessment.db",
         "CA_ASSESSMENT_IMAGE_STORE__Folder": ".\\imgs",
         "CA_ASSESSMENT_IMAGE_STORE__Overwrite": "true"
       }

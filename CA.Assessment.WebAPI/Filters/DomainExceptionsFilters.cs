@@ -1,5 +1,5 @@
-using System.Net;
 using CA.Assessment.Model.Exceptions;
+using CA.Assessment.WebAPI.Dtos;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -41,10 +41,10 @@ public sealed class DomainExceptionFilters : IExceptionFilter
         }
 
         var errorCodes = validationEx.Errors
-            .Select(v => new { Code = v.ErrorCode, Property = v.PropertyName })
+            .Select(AssessmentValidationProblem.FromValidationFailure)
             .ToList();
 
-        var jsonResult = new JsonResult(errorCodes) { StatusCode = (int)HttpStatusCode.BadRequest };
+        var jsonResult = new JsonResult(errorCodes) { StatusCode = StatusCodes.Status422UnprocessableEntity };
 
         return jsonResult;
     }

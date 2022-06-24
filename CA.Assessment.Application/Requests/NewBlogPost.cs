@@ -2,6 +2,8 @@ namespace CA.Assessment.Application.Requests;
 
 public sealed class NewBlogPost
 {
+    public Guid Id { get; }
+
     public string? Title { get; }
 
     public string? Content { get; }
@@ -12,8 +14,9 @@ public sealed class NewBlogPost
 
     public IEnumerable<string>? Tags { get; }
 
-    public NewBlogPost(string? title, string? content, string? author, string? category, IEnumerable<string>? tags)
+    public NewBlogPost(Guid id, string? title, string? content, string? author, string? category, IEnumerable<string>? tags)
     {
+        Id = id;
         Title = title;
         Content = content;
         Author = author;

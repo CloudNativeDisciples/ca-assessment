@@ -1,7 +1,10 @@
+using System.Net.Mime;
 using CA.Assessment.Application.Requests;
+using CA.Assessment.WebAPI.Dtos;
 using CA.Assessment.WebAPI.Filters;
 using CA.Assessment.WebAPI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace CA.Assessment.WebAPI.Controllers;
 
@@ -18,22 +21,33 @@ public class BlogPostsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> NewBlogPostAsync([FromBody] NewBlogPost? newBlogPost)
+    [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(Guid))]
+    [SwaggerResponse(StatusCodes.Status404NotFound)]
+    [SwaggerResponse(StatusCodes.Status400BadRequest)]
+    [SwaggerResponse(StatusCodes.Status422UnprocessableEntity, Type = typeof(IEnumerable<AssessmentValidationProblem>))]
+    [Produces(MediaTypeNames.Application.Json)]
+    [Consumes(MediaTypeNames.Application.Json)]
+    public async Task<IActionResult> NewBlogPostAsync(
+        [FromBody] [SwaggerRequestBody("New Blog Post Data", Required = true)]
+        NewBlogPostDto? newBlogPostDto)
     {
-        if (newBlogPost is null)
+        if (newBlogPostDto is null)
         {
             return BadRequest();
         }
 
-        var newBlogPostId = Guid.NewGuid();
-
-        await _txScriptsFacade.NewBlogPostAsync(newBlogPostId, newBlogPost);
+        var newBlogPostId = await _txScriptsFacade.NewBlogPostAsync(newBlogPostDto);
 
         return Ok(newBlogPostId);
     }
 
     [HttpGet("{blogPostId}")]
-    public async Task<IActionResult> GetBlogPostAsync([FromRoute] Guid blogPostId)
+    [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(BlogPostDetailsDto))]
+    [SwaggerResponse(StatusCodes.Status404NotFound)]
+    [Produces(MediaTypeNames.Application.Json)]
+    public async Task<IActionResult> GetBlogPostAsync(
+        [FromRoute] [SwaggerParameter("Blog Post UUID", Required = true)]
+        Guid blogPostId)
     {
         var maybeBlogPost = await _txScriptsFacade.GetBlogPostAsync(blogPostId);
 
@@ -46,7 +60,12 @@ public class BlogPostsController : ControllerBase
     }
 
     [HttpDelete("{blogPostId}")]
-    public async Task<IActionResult> DeleteBlogPostAsync([FromRoute] Guid blogPostId)
+    [SwaggerResponse(StatusCodes.Status204NoContent)]
+    [SwaggerResponse(StatusCodes.Status403Forbidden)]
+    [SwaggerResponse(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> DeleteBlogPostAsync(
+        [FromRoute] [SwaggerParameter("Blog Post UUID", Required = true)]
+        Guid blogPostId)
     {
         await _txScriptsFacade.DeleteBlogPostAsync(blogPostId);
 
@@ -54,20 +73,35 @@ public class BlogPostsController : ControllerBase
     }
 
     [HttpPatch("{blogPostId}")]
-    public async Task<IActionResult> UpdateBlogPostAsync([FromRoute] Guid blogPostId, [FromBody] UpdateBlogPost? updateBlogPost)
+    [SwaggerResponse(StatusCodes.Status400BadRequest)]
+    [SwaggerResponse(StatusCodes.Status204NoContent)]
+    [SwaggerResponse(StatusCodes.Status404NotFound)]
+    [SwaggerResponse(StatusCodes.Status422UnprocessableEntity, Type = typeof(IEnumerable<AssessmentValidationProblem>))]
+    [Consumes(MediaTypeNames.Application.Json)]
+    public async Task<IActionResult> UpdateBlogPostAsync(
+        [FromRoute] [SwaggerParameter("Blog Post UUID", Required = true)]
+        Guid blogPostId,
+        [FromBody] [SwaggerRequestBody("New Blog Post Data to update existing Blog Post", Required = true)]
+        UpdateBlogPostDto? updateBlogPostDto)
     {
-        if (updateBlogPost is null)
+        if (updateBlogPostDto is null)
         {
             return BadRequest();
         }
 
-        await _txScriptsFacade.UpdateBlogPostAsync(blogPostId, updateBlogPost);
+        await _txScriptsFacade.UpdateBlogPostAsync(blogPostId, updateBlogPostDto);
 
         return NoContent();
     }
 
     [HttpPost("search")]
-    public async Task<IActionResult> SearchBlogPostsAsync([FromBody] SearchBlogPostsFilters? searchBlogPostsFilters)
+    [SwaggerResponse(StatusCodes.Status400BadRequest)]
+    [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(IEnumerable<BlogPostSummaryDto>))]
+    [Produces(MediaTypeNames.Application.Json)]
+    [Consumes(MediaTypeNames.Application.Json)]
+    public async Task<IActionResult> SearchBlogPostsAsync(
+        [FromBody] [SwaggerRequestBody("Blog Post search filters", Required = true)]
+        SearchBlogPostFiltersDto? searchBlogPostsFilters)
     {
         if (searchBlogPostsFilters is null)
         {
@@ -80,7 +114,15 @@ public class BlogPostsController : ControllerBase
     }
 
     [HttpDelete("{blogPostId}/tags")]
-    public async Task<IActionResult> RemoveTagsAsync([FromRoute] Guid blogPostId, [FromBody] IEnumerable<string>? tags)
+    [SwaggerResponse(StatusCodes.Status400BadRequest)]
+    [SwaggerResponse(StatusCodes.Status204NoContent)]
+    [SwaggerResponse(StatusCodes.Status404NotFound)]
+    [Consumes(MediaTypeNames.Application.Json)]
+    public async Task<IActionResult> RemoveTagsAsync(
+        [FromRoute] [SwaggerParameter("Blog Post UUID", Required = true)]
+        Guid blogPostId,
+        [FromBody] [SwaggerRequestBody("Tags to remove from the Blog Post", Required = true)]
+        IEnumerable<string>? tags)
     {
         if (tags is null)
         {
@@ -93,7 +135,15 @@ public class BlogPostsController : ControllerBase
     }
 
     [HttpPut("{blogPostId}/tags")]
-    public async Task<IActionResult> AddTagsAsync([FromRoute] Guid blogPostId, [FromBody] IEnumerable<string>? tags)
+    [SwaggerResponse(StatusCodes.Status400BadRequest)]
+    [SwaggerResponse(StatusCodes.Status204NoContent)]
+    [SwaggerResponse(StatusCodes.Status404NotFound)]
+    [Consumes(MediaTypeNames.Application.Json)]
+    public async Task<IActionResult> AddTagsAsync(
+        [FromRoute] [SwaggerParameter("Blog Post UUID", Required = true)]
+        Guid blogPostId,
+        [FromBody] [SwaggerRequestBody("Tags to add to the Blog Post", Required = true)]
+        IEnumerable<string>? tags)
     {
         if (tags is null)
         {
@@ -106,26 +156,33 @@ public class BlogPostsController : ControllerBase
     }
 
     [HttpPost("{blogPostId}/image")]
-    public async Task<IActionResult> UploadImageAsync([FromRoute] Guid blogPostId, [FromForm] IFormFile? image)
+    [RequestFormLimits(MultipartBodyLengthLimit = 2 * 1024 * 1024)]
+    [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(Guid))]
+    [Consumes("multipart/form-data")]
+    [Produces(MediaTypeNames.Application.Json)]
+    public async Task<IActionResult> UploadImageAsync(
+        [FromRoute] [SwaggerParameter("Blog Post UUID", Required = true)]
+        Guid blogPostId,
+        [SwaggerRequestBody("Image File", Required = true)]
+        IFormFile? image)
     {
         if (image is null)
         {
             return BadRequest();
         }
 
-        var newImageId = Guid.NewGuid();
-
-        await using var imageStream = image.OpenReadStream();
-
-        var newBlogPostImage = new BlogPostImageToAttach(image.Name, image.ContentType, imageStream);
-
-        await _txScriptsFacade.AttachImageToBlogPostAsync(newImageId, blogPostId, newBlogPostImage);
+        var newImageId = await _txScriptsFacade.AttachImageToBlogPostAsync(blogPostId, image);
 
         return Ok(newImageId);
     }
 
     [HttpGet("{blogPostId}/image")]
-    public async Task<IActionResult> GetImageAsync([FromRoute] Guid blogPostId)
+    [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(FileResult))]
+    [SwaggerResponse(StatusCodes.Status404NotFound)]
+    [Produces(MediaTypeNames.Image.Jpeg, Type = typeof(FileResult))]
+    public async Task<IActionResult> GetImageAsync(
+        [FromRoute] [SwaggerParameter("Blog Post UUID", Required = true)]
+        Guid blogPostId)
     {
         var image = await _txScriptsFacade.GetBlogPostImageDataAsync(blogPostId);
 

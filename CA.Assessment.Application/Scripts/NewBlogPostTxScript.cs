@@ -28,7 +28,7 @@ public sealed class NewBlogPostTxScript
         _newBlogPostValidator = newBlogPostValidator ?? throw new ArgumentNullException(nameof(newBlogPostValidator));
     }
 
-    public async Task ExecuteAsync(Guid newBlogPostId, NewBlogPost newBlogPostData)
+    public async Task ExecuteAsync(NewBlogPost newBlogPostData)
     {
         if (newBlogPostData is null)
         {
@@ -49,7 +49,7 @@ public sealed class NewBlogPostTxScript
 
             var blogPostCategory = await _categoriesMaker.GetOrCreateCategoryByNameAsync(newBlogPostData.Category!);
 
-            var newBlogPost = new BlogPost(newBlogPostId, newBlogPostData.Title!, newBlogPostData.Author!,
+            var newBlogPost = new BlogPost(newBlogPostData.Id, newBlogPostData.Title!, newBlogPostData.Author!,
                 newBlogPostData.Content!, Guid.Empty, blogPostTagIdentities, blogPostCategory.Identity);
 
             await _blogPostRepository.SaveAsync(newBlogPost);

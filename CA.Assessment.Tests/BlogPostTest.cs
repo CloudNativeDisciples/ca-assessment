@@ -17,9 +17,9 @@ public class BlogPostTest : IntegrationTest
 
         var newBlogPostId = Guid.NewGuid();
 
-        var newBlogPostRequest = new NewBlogPost("title", "content", "author", "category", new[] { "tag_1", "tag_2" });
+        var newBlogPostRequest = new NewBlogPost(newBlogPostId, "title", "content", "author", "category", new[] { "tag_1", "tag_2" });
 
-        await newBlogPostTxScript.ExecuteAsync(newBlogPostId, newBlogPostRequest);
+        await newBlogPostTxScript.ExecuteAsync(newBlogPostRequest);
 
         var getBlogPostTxScript = Resolve<GetBlogPostTxScript>();
 
@@ -40,9 +40,9 @@ public class BlogPostTest : IntegrationTest
 
         var newBlogPostId = Guid.NewGuid();
 
-        var newBlogPostRequest = new NewBlogPost("title", "content", "author", "category", new[] { "tag_1", "tag_2" });
+        var newBlogPostRequest = new NewBlogPost(newBlogPostId, "title", "content", "author", "category", new[] { "tag_1", "tag_2" });
 
-        await newBlogPostTxScript.ExecuteAsync(newBlogPostId, newBlogPostRequest);
+        await newBlogPostTxScript.ExecuteAsync(newBlogPostRequest);
 
         var getBlogPostTxScript = Resolve<GetBlogPostTxScript>();
 
@@ -68,9 +68,9 @@ public class BlogPostTest : IntegrationTest
 
         var newBlogPostId = Guid.NewGuid();
 
-        var newBlogPostRequest = new NewBlogPost("title", "content", "author", "category", new[] { "tag_1", "tag_2" });
+        var newBlogPostRequest = new NewBlogPost(newBlogPostId, "title", "content", "author", "category", new[] { "tag_1", "tag_2" });
 
-        await newBlogPostTxScript.ExecuteAsync(newBlogPostId, newBlogPostRequest);
+        await newBlogPostTxScript.ExecuteAsync(newBlogPostRequest);
 
         var getBlogPostTxScript = Resolve<GetBlogPostTxScript>();
 
@@ -101,15 +101,15 @@ public class BlogPostTest : IntegrationTest
 
         var newBlogPostId = Guid.NewGuid();
 
-        var newBlogPostRequest = new NewBlogPost("title", "content", "author", "category", new[] { "tag_1", "tag_2" });
+        var newBlogPostRequest = new NewBlogPost(newBlogPostId, "title", "content", "author", "category", new[] { "tag_1", "tag_2" });
 
-        await newBlogPostTxScript.ExecuteAsync(newBlogPostId, newBlogPostRequest);
+        await newBlogPostTxScript.ExecuteAsync(newBlogPostRequest);
 
         var updateBlogPostTxScript = Resolve<UpdateBlogPostTxScript>();
 
-        var updateBlogPost = new UpdateBlogPost("new title", null, "new author", null, null);
+        var updateBlogPost = new UpdateBlogPost(newBlogPostId, "new title", null, "new author", null, null);
 
-        await updateBlogPostTxScript.ExecuteAsync(newBlogPostId, updateBlogPost);
+        await updateBlogPostTxScript.ExecuteAsync(updateBlogPost);
 
         var getBlogPostTxScript = Resolve<GetBlogPostTxScript>();
 
@@ -128,25 +128,25 @@ public class BlogPostTest : IntegrationTest
 
         var newBlogPostId = Guid.NewGuid();
 
-        var newBlogPostRequest = new NewBlogPost("title_1", "content", "author", "category_2", new[] { "tag_3" });
+        var newBlogPostRequest = new NewBlogPost(newBlogPostId, "title_1", "content", "author", "category_2", new[] { "tag_3" });
 
-        await newBlogPostTxScript.ExecuteAsync(newBlogPostId, newBlogPostRequest);
+        await newBlogPostTxScript.ExecuteAsync(newBlogPostRequest);
 
         var anotherBlogPostId = Guid.NewGuid();
 
-        var anotherBlogPost = new NewBlogPost("title_2", "content", "author", "category_1", new[] { "tag_2" });
+        var anotherBlogPost = new NewBlogPost(anotherBlogPostId, "title_2", "content", "author", "category_1", new[] { "tag_2" });
 
-        await newBlogPostTxScript.ExecuteAsync(anotherBlogPostId, anotherBlogPost);
+        await newBlogPostTxScript.ExecuteAsync(anotherBlogPost);
 
         var moreBlogPostId = Guid.NewGuid();
 
-        var moreBlogPosts = new NewBlogPost("title_3", "content", "author", "category_2", new[] { "tag_2" });
+        var moreBlogPosts = new NewBlogPost(moreBlogPostId, "title_3", "content", "author", "category_2", new[] { "tag_2" });
 
-        await newBlogPostTxScript.ExecuteAsync(moreBlogPostId, moreBlogPosts);
+        await newBlogPostTxScript.ExecuteAsync(moreBlogPosts);
 
         var searchBlogPostsTxScript = Resolve<SearchBlogPostsTxScript>();
 
-        var filters = new SearchBlogPostsFilters(null, new[] { "tag_3" }, null);
+        var filters = new SearchBlogPost(null, new[] { "tag_3" }, null);
 
         var blogPostsFound = await searchBlogPostsTxScript.ExecuteAsync(filters);
 
@@ -163,9 +163,9 @@ public class BlogPostTest : IntegrationTest
 
         var newBlogPostId = Guid.NewGuid();
 
-        var newBlogPostRequest = new NewBlogPost("title_1", "content", "author", "category_2", new[] { "tag_3" });
+        var newBlogPostRequest = new NewBlogPost(newBlogPostId, "title_1", "content", "author", "category_2", new[] { "tag_3" });
 
-        await newBlogPostTxScript.ExecuteAsync(newBlogPostId, newBlogPostRequest);
+        await newBlogPostTxScript.ExecuteAsync(newBlogPostRequest);
 
         var tagBlogPostTxScript = Resolve<TagBlogPostTxScript>();
 
@@ -188,10 +188,10 @@ public class BlogPostTest : IntegrationTest
 
         var newBlogPostId = Guid.NewGuid();
 
-        var newBlogPostRequest = new NewBlogPost("title_1", "content", "author", "category_2",
+        var newBlogPostRequest = new NewBlogPost(newBlogPostId, "title_1", "content", "author", "category_2",
             new[] { "tag_1", "tag_2", "tag_3" });
 
-        await newBlogPostTxScript.ExecuteAsync(newBlogPostId, newBlogPostRequest);
+        await newBlogPostTxScript.ExecuteAsync(newBlogPostRequest);
 
         var untagBlogPostTxScript = Resolve<UntagBlogPostTxScript>();
 
@@ -216,18 +216,18 @@ public class BlogPostTest : IntegrationTest
 
         var newImageId = Guid.NewGuid();
 
-        var newBlogPostRequest = new NewBlogPost("title_1", "content", "author", "category_2",
+        var newBlogPostRequest = new NewBlogPost(newBlogPostId, "title_1", "content", "author", "category_2",
             new[] { "tag_1", "tag_2", "tag_3" });
 
-        await newBlogPostTxScript.ExecuteAsync(newBlogPostId, newBlogPostRequest);
+        await newBlogPostTxScript.ExecuteAsync(newBlogPostRequest);
 
         var inMemoryStream = await NewBytesStreamAsync(new byte[] { 15, 14, 13, 14 });
 
-        var newBlogPostImage = new BlogPostImageToAttach("test", "image/png", inMemoryStream);
+        var newBlogPostImage = new AttachImageToBlogPost(newBlogPostId, newImageId, "test", "image/png", inMemoryStream);
 
         var attachImageTxScript = Resolve<AttachBlogPostImageTxScript>();
 
-        await attachImageTxScript.ExecuteAsync(newImageId, newBlogPostId, newBlogPostImage);
+        await attachImageTxScript.ExecuteAsync(newBlogPostImage);
 
         var getBlogPostTxScript = Resolve<GetBlogPostTxScript>();
 

@@ -29,7 +29,7 @@ public sealed class UpdateBlogPostTxScript
         _blogPostRepository = blogPostRepository ?? throw new ArgumentNullException(nameof(blogPostRepository));
     }
 
-    public async Task ExecuteAsync(Guid blogPostId, UpdateBlogPost updateBlogPostData)
+    public async Task ExecuteAsync(UpdateBlogPost updateBlogPostData)
     {
         if (updateBlogPostData is null)
         {
@@ -40,11 +40,11 @@ public sealed class UpdateBlogPostTxScript
 
         await _databaseSessionManager.BeginTransactionAsync();
 
-        var maybeOriginalBlogPost = await _blogPostRepository.GetAsync(blogPostId);
+        var maybeOriginalBlogPost = await _blogPostRepository.GetAsync(updateBlogPostData.Id);
 
         if (maybeOriginalBlogPost is null)
         {
-            throw new BlogPostNotFoundException(blogPostId);
+            throw new BlogPostNotFoundException(updateBlogPostData.Id);
         }
 
         try
