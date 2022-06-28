@@ -5,6 +5,7 @@ using CA.Assessment.Database.Sqlite.Extensions;
 using CA.Assessment.Images.Extensions;
 using CA.Assessment.Model;
 using CA.Assessment.Store.Extensions;
+using CA.Assessment.WebAPI.Services;
 using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -43,6 +44,7 @@ public abstract class IntegrationTest
 
         var loggerMock = new Mock<ILogger>();
 
+        serviceCollection.AddTransient<TxScriptsFacade>();
         serviceCollection.AddSingleton<ICurrentUserKindProvider>(_currentUserKindProvider);
         serviceCollection.AddSingleton(loggerMock.Object);
 

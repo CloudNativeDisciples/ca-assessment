@@ -81,7 +81,7 @@ public sealed class TxScriptsFacade
             throw new ArgumentNullException(nameof(tags));
         }
 
-        await _tagBlogPostTxScript.ExecuteAsync(blogPostId, tags);
+        await _untagBlogPostTxScript.ExecuteAsync(blogPostId, tags);
     }
 
     public async Task<IEnumerable<BlogPostSummaryDto>> SearchBlogPostsAsync(SearchBlogPostFiltersDto filters)
@@ -149,7 +149,7 @@ public sealed class TxScriptsFacade
         var tagDetailDtos = blogPostDetails.Tags
             .Select(t => new TagDetailsDto(t.Identity, t.Name));
 
-        return new BlogPostDetailsDto(blogPostDetails.Image, blogPostDetails.Author, blogPostDetails.Content, blogPostDetails.Title,
+        return new BlogPostDetailsDto(blogPostDetails.Identity, blogPostDetails.Author, blogPostDetails.Content, blogPostDetails.Title,
             blogPostDetails.Image, categoryDetailsDto, tagDetailDtos);
     }
 }
