@@ -10,6 +10,7 @@
           <Format>lcov</Format>
           <SingleHit>false</SingleHit>
           <SkipAutoProps>true</SkipAutoProps>
+          <IncludeTestAssembly>false</IncludeTestAssembly>
         </Configuration>
       </DataCollector>
     </DataCollectors>

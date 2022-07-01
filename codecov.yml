@@ -1,5 +1,16 @@
 ignore:
   - "CA.Assessment.Database.Migrations"
   - "CA.Assessment.Tests"
-  - "CA.Assessment.WebAPI"
   - "CA.Assessment.Model"
+  - "CA.Assessment.WebAPI"
+coverage:
+  range: 50..80
+  round: down
+  precision: 0
+  status:
+    project:
+      default:
+        target: 60%
+        threshold: 2%
+        if_not_found: success
+        informational: true
