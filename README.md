@@ -4,6 +4,7 @@ Assessment for a Senior Backend Engineer role
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=federico-paolillo_ca-assessment&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=federico-paolillo_ca-assessment)
 [![codecov](https://codecov.io/gh/federico-paolillo/ca-assessment/branch/main/graph/badge.svg?token=0QOH0NVJAO)](https://codecov.io/gh/federico-paolillo/ca-assessment)
+![Continuous Integration](https://github.com/federico-paolillo/ca-assessment/actions/workflows/ci.yaml/badge.svg)
 
 ## Assignment
 
