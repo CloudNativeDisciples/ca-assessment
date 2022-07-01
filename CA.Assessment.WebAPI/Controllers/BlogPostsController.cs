@@ -1,5 +1,4 @@
 using System.Net.Mime;
-using CA.Assessment.Application.Requests;
 using CA.Assessment.WebAPI.Dtos;
 using CA.Assessment.WebAPI.Filters;
 using CA.Assessment.WebAPI.Services;
@@ -13,6 +12,7 @@ namespace CA.Assessment.WebAPI.Controllers;
 [TypeFilter(typeof(DomainExceptionFilters))]
 public class BlogPostsController : ControllerBase
 {
+    private const int TWO_MEGABYTES = 2 * 1024 * 1024;
     private readonly TxScriptsFacade _txScriptsFacade;
 
     public BlogPostsController(TxScriptsFacade txScriptsFacade)
@@ -156,7 +156,7 @@ public class BlogPostsController : ControllerBase
     }
 
     [HttpPost("{blogPostId}/image")]
-    [RequestFormLimits(MultipartBodyLengthLimit = 2 * 1024 * 1024)]
+    [RequestFormLimits(MultipartBodyLengthLimit = TWO_MEGABYTES)]
     [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(Guid))]
     [Consumes("multipart/form-data")]
     [Produces(MediaTypeNames.Application.Json)]

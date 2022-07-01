@@ -1,5 +1,3 @@
-using CA.Assessment.Application.Requests;
-using CA.Assessment.Application.Scripts;
 using CA.Assessment.Model;
 using CA.Assessment.Model.Exceptions;
 using CA.Assessment.Tests.Helpers;
@@ -174,7 +172,7 @@ public class BlogPostTest : IntegrationTest
             Category = "category_2",
             Tags = new[]
             {
-                "tag_3",
+                "tag_3"
             }
         };
 
@@ -188,7 +186,7 @@ public class BlogPostTest : IntegrationTest
             Category = "category_1",
             Tags = new[]
             {
-                "tag_2",
+                "tag_2"
             }
         };
 
@@ -202,7 +200,7 @@ public class BlogPostTest : IntegrationTest
             Category = "category_2",
             Tags = new[]
             {
-                "tag_2",
+                "tag_2"
             }
         };
 
@@ -236,7 +234,7 @@ public class BlogPostTest : IntegrationTest
             Category = "category_1",
             Tags = new[]
             {
-                "tag_3",
+                "tag_3"
             }
         };
 
@@ -251,7 +249,7 @@ public class BlogPostTest : IntegrationTest
         Assert.That(tagNames, Has.Count.EqualTo(3));
         Assert.That(tagNames, Is.EquivalentTo(new[] { "tag_1", "tag_2", "tag_3" }));
     }
-    
+
     [Test]
     public async Task Blog_posts_tags_are_never_duplicated()
     {
@@ -267,7 +265,7 @@ public class BlogPostTest : IntegrationTest
             {
                 "tag_1",
                 "tag_2",
-                "tag_3",
+                "tag_3"
             }
         };
 
@@ -298,7 +296,7 @@ public class BlogPostTest : IntegrationTest
             {
                 "tag_1",
                 "tag_2",
-                "tag_3",
+                "tag_3"
             }
         };
 
@@ -329,7 +327,7 @@ public class BlogPostTest : IntegrationTest
             {
                 "tag_1",
                 "tag_2",
-                "tag_3",
+                "tag_3"
             }
         };
 
@@ -352,7 +350,7 @@ public class BlogPostTest : IntegrationTest
 
         var blogPost = await txScriptsFacade.GetBlogPostAsync(newBlogPostId);
         var image = await txScriptsFacade.GetBlogPostImageDataAsync(newBlogPostId);
-        
+
         Assert.That(blogPost!.Image, Is.EqualTo(newImageId));
 
         Assert.That(image, Is.Not.Null);
@@ -362,6 +360,6 @@ public class BlogPostTest : IntegrationTest
         var buffer = await ReadBytesFromStreamAsync(image.ImageStream, 4);
 
         Assert.That(buffer, Has.Length.EqualTo(4));
-        Assert.That(buffer, Is.EqualTo(new byte[] { 15, 14, 13, 14 })); 
+        Assert.That(buffer, Is.EqualTo(new byte[] { 15, 14, 13, 14 }));
     }
 }

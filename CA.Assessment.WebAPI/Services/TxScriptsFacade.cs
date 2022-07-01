@@ -58,7 +58,7 @@ public sealed class TxScriptsFacade
         await using var imageStream = image.OpenReadStream();
 
         var newBlogPostImage = new AttachImageToBlogPost(blogPostId, newImageId, image.Name, image.ContentType, imageStream);
-        
+
         await _attachBlogPostImageTxScript.ExecuteAsync(newBlogPostImage);
 
         return newImageId;

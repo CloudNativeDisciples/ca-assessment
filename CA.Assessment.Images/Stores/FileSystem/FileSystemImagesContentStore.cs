@@ -57,7 +57,7 @@ public sealed class FileSystemImagesContentStore : IImagesContentStore
         {
             throw new DirectoryNotFoundException($"No images directory for {nameof(FileSystemImagesContentStore)} specified");
         }
-        
+
         var imageFileName = GenerateImageFileName(imageRef);
 
         var imageFullPath = Path.Combine(_config.Value.Folder, imageFileName);
@@ -71,7 +71,7 @@ public sealed class FileSystemImagesContentStore : IImagesContentStore
         {
             throw new DirectoryNotFoundException($"No images directory for {nameof(FileSystemImagesContentStore)} specified");
         }
-        
+
         var directoryInfo = new DirectoryInfo(_config.Value.Folder);
 
         if (directoryInfo.Exists)
