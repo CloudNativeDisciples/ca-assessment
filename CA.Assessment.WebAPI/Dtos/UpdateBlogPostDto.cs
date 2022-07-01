@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using CA.Assessment.Model;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace CA.Assessment.WebAPI.Dtos;
@@ -9,7 +10,7 @@ public class UpdateBlogPostDto
     [SwaggerSchema("Title of the Blog Post", Nullable = true, WriteOnly = true)]
     public string? Title { get; set; }
 
-    [MaxLength(1024)]
+    [MaxLength(BlogPost.MAX_CONTENT_SIZE)]
     [SwaggerSchema("Content of the Blog Post", Nullable = true, WriteOnly = true)]
     public string? Content { get; set; }
 

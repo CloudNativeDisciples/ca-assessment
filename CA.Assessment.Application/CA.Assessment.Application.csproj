@@ -7,14 +7,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CA.Assessment.Database\CA.Assessment.Database.csproj" />
-        <ProjectReference Include="..\CA.Assessment.Model\CA.Assessment.Model.csproj" />
+        <ProjectReference Include="..\CA.Assessment.Database\CA.Assessment.Database.csproj"/>
+        <ProjectReference Include="..\CA.Assessment.Model\CA.Assessment.Model.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentValidation" Version="11.0.3" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-        <PackageReference Include="Serilog" Version="2.11.0" />
+        <PackageReference Include="FluentValidation" Version="11.0.3"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0"/>
+        <PackageReference Include="Serilog" Version="2.11.0"/>
     </ItemGroup>
 
 </Project>

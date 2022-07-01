@@ -2,6 +2,8 @@ namespace CA.Assessment.Model;
 
 public sealed class BlogPost
 {
+    public const int MAX_CONTENT_SIZE = 1024;
+
     public Guid Identity { get; }
 
     public string Title { get; }

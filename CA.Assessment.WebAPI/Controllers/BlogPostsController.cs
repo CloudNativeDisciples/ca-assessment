@@ -13,6 +13,7 @@ namespace CA.Assessment.WebAPI.Controllers;
 public class BlogPostsController : ControllerBase
 {
     private const int TWO_MEGABYTES = 2 * 1024 * 1024;
+
     private readonly TxScriptsFacade _txScriptsFacade;
 
     public BlogPostsController(TxScriptsFacade txScriptsFacade)
